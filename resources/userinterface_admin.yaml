@@ -1,0 +1,122 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Static contents distribution using S3 and CloudFront.
+
+Resources:
+  AdminSiteCloudFrontDistributionLogBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: test-attend-admin-site-cf-log-bucket
+      OwnershipControls:
+        Rules:
+        - ObjectOwnership: BucketOwnerPreferred
+      #AccessControl: LogDeliveryWrite
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      LifecycleConfiguration:
+        Rules:
+          - Id: AutoDelete
+            Status: Enabled
+            ExpirationInDays: 15
+
+  AdminSiteBucket:
+    Type: AWS::S3::Bucket
+    #DeletionPolicy: Retain
+    Properties:
+      BucketName: test-attend-admin-site-bucket
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+
+  AdminSiteBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref AdminSiteBucket
+      PolicyDocument:
+        Statement:
+          - Action: s3:GetObject
+            Effect: Allow
+            Resource: !Sub arn:aws:s3:::${AdminSiteBucket}/*
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/${AdminSiteCloudFrontDistribution}
+          #- Action: s3:ListBucket
+          #  Effect: Allow
+          #  Resource: !Sub arn:aws:s3:::${AdminSiteBucket}
+          #  Principal:
+          #    Service: cloudfront.amazonaws.com
+          #  Condition:
+          #    StringEquals:
+          #      AWS:SourceArn: !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/${AdminSiteCloudFrontDistribution}
+
+  AdminSiteCloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        PriceClass: PriceClass_200
+        Origins:
+          - Id: AdminSiteOrigin
+            DomainName: !Sub ${AdminSiteBucket}.s3.${AWS::Region}.amazonaws.com
+            OriginPath: /dist
+            OriginAccessControlId: !GetAtt OACAdminSite.Id
+            S3OriginConfig:
+              OriginAccessIdentity: ""
+        Enabled: true
+        DefaultRootObject: index.html
+        Logging:
+          IncludeCookies: false
+          Bucket: !Sub ${AdminSiteCloudFrontDistributionLogBucket}.s3.${AWS::Region}.amazonaws.com
+          Prefix: test-attend-admin-site-distribution/
+        Comment: test-attend-admin-site-distribution
+        DefaultCacheBehavior:
+          TargetOriginId: AdminSiteOrigin
+          ViewerProtocolPolicy: redirect-to-https
+          AllowedMethods:
+            - HEAD
+            - GET
+          CachedMethods:
+            - HEAD
+            - GET
+          DefaultTTL: 0
+          MaxTTL: 0
+          MinTTL: 0
+          ForwardedValues:
+            QueryString: false
+        CustomErrorResponses:
+          - ErrorCachingMinTTL: 0
+            ErrorCode: 403
+            ResponseCode: 403
+            ResponsePagePath: /index.html
+          - ErrorCachingMinTTL: 0
+            ErrorCode: 404
+            ResponseCode: 404
+            ResponsePagePath: /index.html
+        IPV6Enabled: false
+ 
+  OACAdminSite:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Description: test-attend-admin-site-oac
+        Name: test-attend-admin-site-oac
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+
+
+Outputs:
+  AdminSiteCloudFrontDistributionDomain:
+    Value: !GetAtt AdminSiteCloudFrontDistribution.DomainName
+    Description: CloudFront Domain Name
+    Export:
+      Name: !Sub ${Environment}-${SiteName}-CloudFrontDomainName
