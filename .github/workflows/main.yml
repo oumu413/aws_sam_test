@@ -6,9 +6,6 @@ on:
     branches:
       - develop   # 開発環境
       - main
-    paths:
-      - frontend/admin/**
-      - resources/userinterface_admin/**
     workflow_dispatch:
 
 jobs:
