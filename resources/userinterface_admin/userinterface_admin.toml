@@ -1,0 +1,28 @@
+version = 0.1
+
+### Dev環境 ###
+[dev]
+# build
+[dev.build]
+[dev.build.parameters]
+# deploy
+[dev.deploy]
+[dev.deploy.parameters]
+region = "ap-northeast-3"
+confirm_changeset = true
+capabilities = ""
+disable_rollback = true
+image_repositories = []
+
+### Prod環境 ###
+[prod]
+# build
+[prod.build.parameters]
+# deploy
+[prod.deploy]
+[prod.deploy.parameters]
+region = "ap-northeast-3"
+confirm_changeset = true
+capabilities = ""
+disable_rollback = true
+image_repositories = []
