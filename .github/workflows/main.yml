@@ -7,7 +7,12 @@ on:
       - develop   # 開発環境
       - main
     workflow_dispatch:
-
+    
+# allow use id-token
+permissions:
+  id-token: write # required!
+  contents: read
+  
 jobs:
   ####### Build(CI) #######
 #  build:
