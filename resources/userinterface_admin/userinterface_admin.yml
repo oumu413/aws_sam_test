@@ -1,11 +1,17 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: Static contents distribution using S3 and CloudFront.
 
+Parameters:
+  AppName:
+    Type: String
+    Default: test-attend
+
+
 Resources:
   AdminSiteCloudFrontDistributionLogBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: test-attend-admin-site-cf-log-bucket
+      BucketName: !Sub ${AppName}-admin-site-cf-log-bucket
       OwnershipControls:
         Rules:
         - ObjectOwnership: BucketOwnerPreferred
@@ -25,7 +31,7 @@ Resources:
     Type: AWS::S3::Bucket
     #DeletionPolicy: Retain
     Properties:
-      BucketName: test-attend-admin-site-bucket
+      BucketName: !Sub ${AppName}-admin-site-bucket
       BucketEncryption:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
@@ -76,8 +82,8 @@ Resources:
         Logging:
           IncludeCookies: false
           Bucket: !Sub ${AdminSiteCloudFrontDistributionLogBucket}.s3.${AWS::Region}.amazonaws.com
-          Prefix: test-attend-admin-site-distribution/
-        Comment: test-attend-admin-site-distribution
+          Prefix: !Sub ${AppName}-admin-site-distribution/
+        Comment: !Sub ${AppName}-admin-site-distribution
         DefaultCacheBehavior:
           TargetOriginId: AdminSiteOrigin
           ViewerProtocolPolicy: redirect-to-https
@@ -107,8 +113,8 @@ Resources:
     Type: AWS::CloudFront::OriginAccessControl
     Properties:
       OriginAccessControlConfig:
-        Description: test-attend-admin-site-oac
-        Name: test-attend-admin-site-oac
+        Description: !Sub ${AppName}-admin-site-oac
+        Name: !Sub ${AppName}-admin-site-oac
         OriginAccessControlOriginType: s3
         SigningBehavior: always
         SigningProtocol: sigv4
