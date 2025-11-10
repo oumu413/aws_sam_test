@@ -4,7 +4,7 @@ Description: Static contents distribution using S3 and CloudFront.
 Parameters:
   AppName:
     Type: String
-    Default: test-attendance-test
+    Default: test-attendance
 
 
 Resources:
