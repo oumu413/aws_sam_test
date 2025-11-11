@@ -73,7 +73,6 @@ Resources:
         Origins:
           - Id: AdminSiteOrigin
             DomainName: !Sub ${AdminSiteBucket}.s3.${AWS::Region}.amazonaws.com
-            OriginPath: /
             OriginAccessControlId: !GetAtt OACAdminSite.Id
             S3OriginConfig:
               OriginAccessIdentity: ""
