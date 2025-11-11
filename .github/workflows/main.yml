@@ -55,6 +55,7 @@ jobs:
       - name: SAM Deploy
         run: sam deploy \
             --template-file userinterface_admin.yml \
+            --config-file userinterface_admin.toml \
             --stack-name ${{ secrets.STACK_NAME_DEV }} \
             --AppName ${{ secrets.APP_NAME_DEV }} \
             --no-confirm-changeset \
