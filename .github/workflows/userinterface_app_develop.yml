@@ -5,11 +5,10 @@ on:
   push:
     branches:
       - develop   # 開発環境
-  workflow_dispatch:
-  pull_request:
-    paths-ignore:
+    paths:
     - frontend/app/**
     - resources/userinterface_app/**
+  workflow_dispatch:
     
 permissions:
   id-token: write
