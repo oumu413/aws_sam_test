@@ -71,11 +71,12 @@ jobs:
           sam deploy \
             --template-file userinterface_admin.yml \
             --config-file userinterface_admin.toml \
-            --stack-name dev-${{ secrets.APP_NAME_DEV }}-userinterface-admin \
-            --parameter-overrides AppName=${{ secrets.APP_NAME_DEV }} \
+            --config-env dev \
+            --stack-name dev-${{ secrets.APP_NAME }}-userinterface-admin \
+            --parameter-overrides AppName=${{ secrets.APP_NAME }} \
             --no-confirm-changeset \
             --no-fail-on-empty-changeset
         working-directory: resources/userinterface_admin
 
       - name: Upload to S3
-        run: aws s3 sync dist s3://${{ secrets.APP_NAME_DEV }}-admin-site-bucket --delete  
+        run: aws s3 sync dist s3://dev-${{ secrets.APP_NAME }}-admin-site-bucket --delete  

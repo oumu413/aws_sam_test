@@ -2,16 +2,18 @@ AWSTemplateFormatVersion: 2010-09-09
 Description: Static contents distribution using S3 and CloudFront.
 
 Parameters:
+  Env:
+    Type: String
+    Default: dev
   AppName:
     Type: String
     Default: test-attendance
-
 
 Resources:
   AdminSiteCloudFrontDistributionLogBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub ${AppName}-admin-site-cf-log-bucket
+      BucketName: !Sub ${Env}-${AppName}-admin-site-cf-log-bucket
       OwnershipControls:
         Rules:
         - ObjectOwnership: BucketOwnerPreferred
@@ -31,7 +33,7 @@ Resources:
     Type: AWS::S3::Bucket
     #DeletionPolicy: Retain
     Properties:
-      BucketName: !Sub ${AppName}-admin-site-bucket
+      BucketName: !Sub ${Env}-${AppName}-admin-site-bucket
       BucketEncryption:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
@@ -81,8 +83,8 @@ Resources:
         Logging:
           IncludeCookies: false
           Bucket: !Sub ${AdminSiteCloudFrontDistributionLogBucket}.s3.${AWS::Region}.amazonaws.com
-          Prefix: !Sub ${AppName}-admin-site-distribution/
-        Comment: !Sub ${AppName}-admin-site-distribution
+          Prefix: !Sub ${Env}-${AppName}-admin-site-distribution/
+        Comment: !Sub ${Env}-${AppName}-admin-site-distribution
         DefaultCacheBehavior:
           TargetOriginId: AdminSiteOrigin
           ViewerProtocolPolicy: redirect-to-https
@@ -112,8 +114,8 @@ Resources:
     Type: AWS::CloudFront::OriginAccessControl
     Properties:
       OriginAccessControlConfig:
-        Description: !Sub ${AppName}-admin-site-oac
-        Name: !Sub ${AppName}-admin-site-oac
+        Description: !Sub ${Env}-${AppName}-admin-site-oac
+        Name: !Sub ${Env}-${AppName}-admin-site-oac
         OriginAccessControlOriginType: s3
         SigningBehavior: always
         SigningProtocol: sigv4
@@ -124,4 +126,4 @@ Outputs:
     Value: !GetAtt AdminSiteCloudFrontDistribution.DomainName
     Description: CloudFront Domain Name
     Export:
-      Name: Admin-Site-CloudFrontDomainName
+      Name: ${Env}-Admin-Site-CloudFrontDomainName

@@ -9,6 +9,7 @@ version = 0.1
 [dev.deploy]
 [dev.deploy.parameters]
 region = "ap-northeast-3"
+parameter_overrides = "Env=dev"
 confirm_changeset = true
 capabilities = ""
 disable_rollback = true
@@ -22,6 +23,7 @@ image_repositories = []
 [prod.deploy]
 [prod.deploy.parameters]
 region = "ap-northeast-3"
+parameter_overrides = "Env=prod"
 confirm_changeset = true
 capabilities = ""
 disable_rollback = true

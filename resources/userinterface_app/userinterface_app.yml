@@ -2,6 +2,9 @@ AWSTemplateFormatVersion: 2010-09-09
 Description: App site distribution using S3 and CloudFront.
 
 Parameters:
+  Env:
+    Type: String
+    Default: dev
   AppName:
     Type: String
     Default: test-attendance
@@ -10,7 +13,7 @@ Resources:
   AppSiteCloudFrontDistributionLogBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub ${AppName}-app-site-cf-log-bucket
+      BucketName: !Sub ${Env}-${AppName}-app-site-cf-log-bucket
       OwnershipControls:
         Rules:
         - ObjectOwnership: BucketOwnerPreferred
@@ -30,7 +33,7 @@ Resources:
     Type: AWS::S3::Bucket
     #DeletionPolicy: Retain
     Properties:
-      BucketName: !Sub ${AppName}-app-site-bucket
+      BucketName: !Sub ${Env}-${AppName}-app-site-bucket
       BucketEncryption:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
@@ -80,8 +83,8 @@ Resources:
         Logging:
           IncludeCookies: false
           Bucket: !Sub ${AppSiteCloudFrontDistributionLogBucket}.s3.${AWS::Region}.amazonaws.com
-          Prefix: !Sub ${AppName}-app-site-distribution/
-        Comment: !Sub ${AppName}-app-site-distribution
+          Prefix: !Sub ${Env}-${AppName}-app-site-distribution/
+        Comment: !Sub ${Env}-${AppName}-app-site-distribution
         DefaultCacheBehavior:
           TargetOriginId: AppSiteOrigin
           ViewerProtocolPolicy: redirect-to-https
@@ -111,8 +114,8 @@ Resources:
     Type: AWS::CloudFront::OriginAccessControl
     Properties:
       OriginAccessControlConfig:
-        Description: !Sub ${AppName}-app-site-oac
-        Name: !Sub ${AppName}-app-site-oac
+        Description: !Sub ${Env}-${AppName}-app-site-oac
+        Name: !Sub ${Env}-${AppName}-app-site-oac
         OriginAccessControlOriginType: s3
         SigningBehavior: always
         SigningProtocol: sigv4
@@ -123,4 +126,4 @@ Outputs:
     Value: !GetAtt AppSiteCloudFrontDistribution.DomainName
     Description: CloudFront Domain Name
     Export:
-      Name: App-Site-CloudFrontDomainName
+      Name: ${Env}-App-Site-CloudFrontDomainName
