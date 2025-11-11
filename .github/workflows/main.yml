@@ -53,7 +53,8 @@ jobs:
         working-directory: resources/userinterface_admin
 
       - name: SAM Deploy
-        run: sam deploy \
+        run: |
+          sam deploy \
             --template-file userinterface_admin.yml \
             --config-file userinterface_admin.toml \
             --stack-name test \
