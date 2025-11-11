@@ -71,7 +71,7 @@ jobs:
           sam deploy \
             --template-file userinterface_admin.yml \
             --config-file userinterface_admin.toml \
-            --stack-name ${{ secrets.STACK_NAME_DEV }} \
+            --stack-name dev-${{ secrets.APP_NAME_DEV }}-userinterface-admin \
             --parameter-overrides AppName=${{ secrets.APP_NAME_DEV }} \
             --no-confirm-changeset \
             --no-fail-on-empty-changeset
