@@ -126,4 +126,4 @@ Outputs:
     Value: !GetAtt AppSiteCloudFrontDistribution.DomainName
     Description: CloudFront Domain Name
     Export:
-      Name: ${Env}-App-Site-CloudFrontDomainName
+      Name: App-Site-CloudFrontDomainName

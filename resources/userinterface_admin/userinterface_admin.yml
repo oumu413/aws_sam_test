@@ -126,4 +126,4 @@ Outputs:
     Value: !GetAtt AdminSiteCloudFrontDistribution.DomainName
     Description: CloudFront Domain Name
     Export:
-      Name: ${Env}-Admin-Site-CloudFrontDomainName
+      Name: Admin-Site-CloudFrontDomainName
