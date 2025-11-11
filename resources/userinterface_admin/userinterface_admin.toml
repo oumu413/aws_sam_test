@@ -13,7 +13,7 @@ parameter_overrides = "Env=dev"
 confirm_changeset = true
 capabilities = ""
 disable_rollback = true
-image_repositories = []
+image_repositories = [CAPABILITY_IAM]
 
 ### Prod環境 ###
 [prod]
@@ -27,4 +27,4 @@ parameter_overrides = "Env=prod"
 confirm_changeset = true
 capabilities = ""
 disable_rollback = true
-image_repositories = []
+image_repositories = [CAPABILITY_IAM]
