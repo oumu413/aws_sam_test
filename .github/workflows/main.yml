@@ -49,12 +49,12 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION_DEV }}
 
       - name: SAM Build
-        run: sam build --template-file userinterface_admin.yaml
+        run: sam build --template-file userinterface_admin.yml
         working-directory: resources/userinterface_admin
 
       - name: SAM Deploy
         run: sam deploy \
-            --template-file userinterface_admin.yaml \
+            --template-file userinterface_admin.yml \
             --stack-name ${{ secrets.STACK_NAME_DEV }} \
             --AppName ${{ secrets.APP_NAME_DEV }} \
             --no-confirm-changeset \
