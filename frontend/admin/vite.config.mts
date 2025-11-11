@@ -46,17 +46,31 @@ export default defineConfig({
         configFile: 'src/styles/settings.scss',
       },
     }),
+    
     Fonts({
-      fontsource: {
+      google: {
         families: [
           {
             name: 'Roboto',
-            weights: [100, 300, 400, 500, 700, 900],
-            styles: ['normal', 'italic'],
+            styles: 'wght@400;700', // 必要なウェイトのみ
           },
         ],
+        display: 'swap', // 読み込み中のUX改善
+        //preload: true,   // 初期表示を高速化
       },
     }),
+
+    //Fonts({
+    //  fontsource: {
+    //    families: [
+    //      {
+    //        name: 'Roboto',
+    //        weights: [100, 300, 400, 500, 700, 900],
+    //        styles: ['normal', 'italic'],
+    //      },
+    //    ],
+    //  },
+    //}),
   ],
   optimizeDeps: {
     exclude: [
