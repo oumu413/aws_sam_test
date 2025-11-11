@@ -52,25 +52,12 @@ export default defineConfig({
         families: [
           {
             name: 'Roboto',
-            styles: 'wght@400;700', // 必要なウェイトのみ
+            styles: 'wght@100;300;400;500;700;900',
           },
         ],
         display: 'swap', // 読み込み中のUX改善
-        //preload: true,   // 初期表示を高速化
       },
     }),
-
-    //Fonts({
-    //  fontsource: {
-    //    families: [
-    //      {
-    //        name: 'Roboto',
-    //        weights: [100, 300, 400, 500, 700, 900],
-    //        styles: ['normal', 'italic'],
-    //      },
-    //    ],
-    //  },
-    //}),
   ],
   optimizeDeps: {
     exclude: [
