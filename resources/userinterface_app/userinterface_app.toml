@@ -11,7 +11,7 @@ version = 0.1
 region = "ap-northeast-3"
 parameter_overrides = "Env=dev"
 confirm_changeset = true
-capabilities = [CAPABILITY_IAM]
+capabilities = ["CAPABILITY_IAM"]
 disable_rollback = true
 image_repositories = []
 
@@ -25,6 +25,6 @@ image_repositories = []
 region = "ap-northeast-3"
 parameter_overrides = "Env=prod"
 confirm_changeset = true
-capabilities = [CAPABILITY_IAM]
+capabilities = ["CAPABILITY_IAM"]
 disable_rollback = true
 image_repositories = []
