@@ -16,4 +16,9 @@ export default createVuetify({
   theme: {
     defaultTheme: 'system',
   },
+  defaults: {
+    global: {
+      font: 'Roboto',
+    },
+  },
 })
