@@ -1,5 +1,5 @@
 
-name: Admin site distribution using S3 and CloudFront with AWS SAM (develop)
+name: App site distribution using S3 and CloudFront with AWS SAM (develop)
 
 on:
   push:
@@ -8,8 +8,8 @@ on:
   workflow_dispatch:
   pull_request:
     paths-ignore:
-    - frontend/admin/**
-    - resources/userinterface_admin/**
+    - frontend/app/**
+    - resources/userinterface_app/**
     
 permissions:
   id-token: write
@@ -30,17 +30,17 @@ jobs:
   
       - name: Install Dependencies
         run: npm install
-        working-directory: frontend/admin
+        working-directory: frontend/app
 
       - name: Frontend Build
         run: npm run build
-        working-directory: frontend/admin
+        working-directory: frontend/app
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: frontend-admin-build
-          path: frontend/admin/dist
+          name: frontend-app-build
+          path: frontend/app/dist
 
   ####### Deploy(CD) #######
   deploy:
@@ -53,7 +53,7 @@ jobs:
       - name: Download Build Artifact
         uses: actions/download-artifact@v4
         with:
-          name: frontend-admin-build
+          name: frontend-app-build
           path: dist
         
       - name: Configure AWS Credentials
@@ -63,19 +63,19 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION_DEV }}
 
       - name: SAM Build
-        run: sam build --template-file userinterface_admin.yml
-        working-directory: resources/userinterface_admin
+        run: sam build --template-file userinterface_app.yml
+        working-directory: resources/userinterface_app
 
       - name: SAM Deploy
         run: |
           sam deploy \
-            --template-file userinterface_admin.yml \
-            --config-file userinterface_admin.toml \
+            --template-file userinterface_app.yml \
+            --config-file userinterface_app.toml \
             --stack-name ${{ secrets.STACK_NAME_DEV }} \
             --parameter-overrides AppName=${{ secrets.APP_NAME_DEV }} \
             --no-confirm-changeset \
             --no-fail-on-empty-changeset
-        working-directory: resources/userinterface_admin
+        working-directory: resources/userinterface_app
 
       - name: Upload to S3
-        run: aws s3 sync dist s3://${{ secrets.APP_NAME_DEV }}-admin-site-bucket --delete  
+        run: aws s3 sync dist s3://${{ secrets.APP_NAME_DEV }}-app-site-bucket --delete

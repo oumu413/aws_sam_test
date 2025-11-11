@@ -1,0 +1,126 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: App site distribution using S3 and CloudFront.
+
+Parameters:
+  AppName:
+    Type: String
+    Default: test-attendance
+
+Resources:
+  AppSiteCloudFrontDistributionLogBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub ${AppName}-app-site-cf-log-bucket
+      OwnershipControls:
+        Rules:
+        - ObjectOwnership: BucketOwnerPreferred
+      #AccessControl: LogDeliveryWrite
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      LifecycleConfiguration:
+        Rules:
+          - Id: AutoDelete
+            Status: Enabled
+            ExpirationInDays: 15
+
+  AppSiteBucket:
+    Type: AWS::S3::Bucket
+    #DeletionPolicy: Retain
+    Properties:
+      BucketName: !Sub ${AppName}-app-site-bucket
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+
+  AppSiteBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref AppSiteBucket
+      PolicyDocument:
+        Statement:
+          - Action: s3:GetObject
+            Effect: Allow
+            Resource: !Sub arn:aws:s3:::${AppSiteBucket}/*
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/${AppSiteCloudFrontDistribution}
+          #- Action: s3:ListBucket
+          #  Effect: Allow
+          #  Resource: !Sub arn:aws:s3:::${AppSiteBucket}
+          #  Principal:
+          #    Service: cloudfront.amazonaws.com
+          #  Condition:
+          #    StringEquals:
+          #      AWS:SourceArn: !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/${AppSiteCloudFrontDistribution}
+
+  AppSiteCloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        PriceClass: PriceClass_200
+        Origins:
+          - Id: AppSiteOrigin
+            DomainName: !Sub ${AppSiteBucket}.s3.${AWS::Region}.amazonaws.com
+            OriginAccessControlId: !GetAtt OACAppSite.Id
+            S3OriginConfig:
+              OriginAccessIdentity: ""
+        Enabled: true
+        DefaultRootObject: index.html
+        Logging:
+          IncludeCookies: false
+          Bucket: !Sub ${AppSiteCloudFrontDistributionLogBucket}.s3.${AWS::Region}.amazonaws.com
+          Prefix: !Sub ${AppName}-app-site-distribution/
+        Comment: !Sub ${AppName}-app-site-distribution
+        DefaultCacheBehavior:
+          TargetOriginId: AppSiteOrigin
+          ViewerProtocolPolicy: redirect-to-https
+          AllowedMethods:
+            - HEAD
+            - GET
+          CachedMethods:
+            - HEAD
+            - GET
+          DefaultTTL: 0
+          MaxTTL: 0
+          MinTTL: 0
+          ForwardedValues:
+            QueryString: false
+        CustomErrorResponses:
+          - ErrorCachingMinTTL: 0
+            ErrorCode: 403
+            ResponseCode: 403
+            ResponsePagePath: /index.html
+          - ErrorCachingMinTTL: 0
+            ErrorCode: 404
+            ResponseCode: 404
+            ResponsePagePath: /index.html
+        IPV6Enabled: false
+ 
+  OACAppSite:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Description: !Sub ${AppName}-app-site-oac
+        Name: !Sub ${AppName}-app-site-oac
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+
+
+Outputs:
+  AppSiteCloudFrontDistributionDomain:
+    Value: !GetAtt AppSiteCloudFrontDistribution.DomainName
+    Description: CloudFront Domain Name
+    Export:
+      Name: App-Site-CloudFrontDomainName
