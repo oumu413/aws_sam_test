@@ -77,5 +77,5 @@ jobs:
             --no-fail-on-empty-changeset
         working-directory: resources/userinterface_app
 
-      - name: Upload to S3
-        run: aws s3 sync dist s3://dev-${{ secrets.APP_NAME }}-app-site-bucket --delete
+      #- name: Upload to S3
+      #  run: aws s3 sync dist s3://dev-${{ secrets.APP_NAME }}-app-site-bucket --delete

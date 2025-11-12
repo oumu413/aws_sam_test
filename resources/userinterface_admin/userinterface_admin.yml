@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Static contents distribution using S3 and CloudFront.
+Description: S3 + CloudFront + Route53 A Record(Admin site)
 
 Parameters:
   Env:
@@ -8,6 +8,12 @@ Parameters:
   AppName:
     Type: String
     Default: test-attendance
+  DomainName:
+    Type: String
+  HostedZoneId:
+    Type: String
+  CertificateArn:
+    Type: String
 
 Resources:
   AdminSiteCloudFrontDistributionLogBucket:
@@ -108,6 +114,9 @@ Resources:
             ErrorCode: 404
             ResponseCode: 404
             ResponsePagePath: /index.html
+        ViewerCertificate:
+          AcmCertificateArn: !Ref CertificateArn
+          SslSupportMethod: sni-only
         IPV6Enabled: false
  
   OACAdminSite:
@@ -119,7 +128,16 @@ Resources:
         OriginAccessControlOriginType: s3
         SigningBehavior: always
         SigningProtocol: sigv4
-
+  
+  Route53RecordSet:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref HostedZoneId
+      Name: !Sub roundadmin.${DomainName}
+      Type: A
+      AliasTarget:
+        HostedZoneId: Z2FDTNDATAQYW2 #　CloudFront Hosted Zone ID (固定値)
+        DNSName: !GetAtt AdminSiteCloudFrontDistribution.DomainName
 
 Outputs:
   AdminSiteCloudFrontDistributionDomain:
