@@ -77,18 +77,19 @@ Resources:
     Type: AWS::CloudFront::Distribution
     Properties:
       DistributionConfig:
+        Aliases:
+          - !Sub roundadmin.${DomainName}
         PriceClass: PriceClass_200
         Origins:
           - Id: AdminSiteOrigin
             DomainName: !Sub ${AdminSiteBucket}.s3.${AWS::Region}.amazonaws.com
             OriginAccessControlId: !GetAtt OACAdminSite.Id
-            S3OriginConfig:
-              OriginAccessIdentity: ""
+            S3OriginConfig: {}
         Enabled: true
         DefaultRootObject: index.html
         Logging:
           IncludeCookies: false
-          Bucket: !Sub ${AdminSiteCloudFrontDistributionLogBucket}.s3.${AWS::Region}.amazonaws.com
+          Bucket: !Ref AdminSiteCloudFrontDistributionLogBucket
           Prefix: !Sub ${Env}-${AppName}-admin-site-distribution/
         Comment: !Sub ${Env}-${AppName}-admin-site-distribution
         DefaultCacheBehavior:
@@ -105,6 +106,21 @@ Resources:
           MinTTL: 0
           ForwardedValues:
             QueryString: false
+        CacheBehaviors:
+          - PathPattern: "/assets/*"
+            TargetOriginId: AdminSiteOrigin
+            ViewerProtocolPolicy: redirect-to-https
+            AllowedMethods:
+              - GET
+              - HEAD
+            CachedMethods:
+              - GET
+              - HEAD
+            DefaultTTL: 86400
+            MaxTTL: 31536000
+            MinTTL: 0
+            ForwardedValues:
+              QueryString: false
         CustomErrorResponses:
           - ErrorCachingMinTTL: 0
             ErrorCode: 403
@@ -117,6 +133,7 @@ Resources:
         ViewerCertificate:
           AcmCertificateArn: !Ref CertificateArn
           SslSupportMethod: sni-only
+          MinimumProtocolVersion: TLSv1.2_2021
         IPV6Enabled: false
  
   OACAdminSite:
