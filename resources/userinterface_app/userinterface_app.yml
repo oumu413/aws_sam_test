@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: App site distribution using S3 and CloudFront.
+Description: S3 + CloudFront + Route53 A Record(App site)
 
 Parameters:
   Env:
@@ -8,6 +8,12 @@ Parameters:
   AppName:
     Type: String
     Default: test-attendance
+  DomainName:
+    Type: String
+  HostedZoneId:
+    Type: String
+  CertificateArn:
+    Type: String
 
 Resources:
   AppSiteCloudFrontDistributionLogBucket:
@@ -71,13 +77,14 @@ Resources:
     Type: AWS::CloudFront::Distribution
     Properties:
       DistributionConfig:
+        Aliases:
+          - !Sub *.${DomainName}
         PriceClass: PriceClass_200
         Origins:
           - Id: AppSiteOrigin
             DomainName: !Sub ${AppSiteBucket}.s3.${AWS::Region}.amazonaws.com
             OriginAccessControlId: !GetAtt OACAppSite.Id
-            S3OriginConfig:
-              OriginAccessIdentity: ""
+            S3OriginConfig: {}
         Enabled: true
         DefaultRootObject: index.html
         Logging:
@@ -99,6 +106,21 @@ Resources:
           MinTTL: 0
           ForwardedValues:
             QueryString: false
+        CacheBehaviors:
+          - PathPattern: "/assets/*"
+            TargetOriginId: AdminSiteOrigin
+            ViewerProtocolPolicy: redirect-to-https
+            AllowedMethods:
+              - GET
+              - HEAD
+            CachedMethods:
+              - GET
+              - HEAD
+            DefaultTTL: 86400
+            MaxTTL: 31536000
+            MinTTL: 0
+            ForwardedValues:
+              QueryString: false
         CustomErrorResponses:
           - ErrorCachingMinTTL: 0
             ErrorCode: 403
@@ -108,6 +130,10 @@ Resources:
             ErrorCode: 404
             ResponseCode: 404
             ResponsePagePath: /index.html
+        ViewerCertificate:
+          AcmCertificateArn: !Ref CertificateArn
+          SslSupportMethod: sni-only
+          MinimumProtocolVersion: TLSv1.2_2021
         IPV6Enabled: false
  
   OACAppSite:
@@ -119,7 +145,6 @@ Resources:
         OriginAccessControlOriginType: s3
         SigningBehavior: always
         SigningProtocol: sigv4
-
 
 Outputs:
   AppSiteCloudFrontDistributionDomain:
