@@ -78,7 +78,7 @@ Resources:
     Properties:
       DistributionConfig:
         Aliases:
-          - !Sub *.${DomainName}
+          - !Sub "*.${DomainName}"
         PriceClass: PriceClass_200
         Origins:
           - Id: AppSiteOrigin
