@@ -108,7 +108,7 @@ Resources:
             QueryString: false
         CacheBehaviors:
           - PathPattern: "/assets/*"
-            TargetOriginId: AdminSiteOrigin
+            TargetOriginId: AppSiteOrigin
             ViewerProtocolPolicy: redirect-to-https
             AllowedMethods:
               - GET
