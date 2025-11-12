@@ -89,7 +89,7 @@ Resources:
         DefaultRootObject: index.html
         Logging:
           IncludeCookies: false
-          Bucket: !Ref AdminSiteCloudFrontDistributionLogBucket
+          Bucket: !Sub AdminSiteCloudFrontDistributionLogBucket.s3.${AWS::Region}.amazonaws.com
           Prefix: !Sub ${Env}-${AppName}-admin-site-distribution/
         Comment: !Sub ${Env}-${AppName}-admin-site-distribution
         DefaultCacheBehavior:
