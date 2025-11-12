@@ -72,10 +72,11 @@ jobs:
             --config-file userinterface_admin.toml \
             --config-env dev \
             --stack-name dev-${{ secrets.APP_NAME }}-userinterface-admin \
-            --parameter-overrides AppName=${{ secrets.APP_NAME }} \
-            --parameter-overrides DomainName=${{ secrets.DOMAIN_NAME_DEV }} \
-            --parameter-overrides HostedZoneId=${{ secrets.HOSTED_ZONE_ID }} \
-            --parameter-overrides CertificateArn=${{ secrets.ACM_CERTIFICATE_ARN }} \
+            --parameter-overrides \
+              AppName=${{ secrets.APP_NAME }} \
+              DomainName=${{ secrets.DOMAIN_NAME_DEV }} \
+              HostedZoneId=${{ secrets.HOSTED_ZONE_ID }} \
+              CertificateArn=${{ secrets.ACM_CERTIFICATE_ARN }} \
             --no-confirm-changeset \
             --no-fail-on-empty-changeset
         working-directory: resources/userinterface_admin
