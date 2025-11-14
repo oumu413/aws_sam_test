@@ -1,5 +1,5 @@
 
-name: User admin site distribution using S3 and CloudFront with AWS SAM (develop)
+name: User admin site distribution (develop)
 
 on:
   push:

@@ -1,5 +1,5 @@
 
-name: Operations site distribution using S3 and CloudFront with AWS SAM (develop)
+name: Operations site distribution (develop)
 
 on:
   push:
