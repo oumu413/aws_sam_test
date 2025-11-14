@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Template to setup cognito as part of bootstrap.
+Description: cognito operation users user pool
 
 Parameters:
   Env:
@@ -27,14 +27,14 @@ Resources:
           EmailMessage: !Join           
             - ""
             - - "Login into operations UI application at "
-              - "\n"
+              - "<br>"
               - "https://"
               - "round-operations."
               - !Ref DomainName
               - "/"
-              - "\n\n"
+              - "<br><br>"
               - "Username: {username}"
-              - "\n"
+              - "<br>"
               - "Temporary password: {####}"
           EmailSubject: !Join 
             - ""
