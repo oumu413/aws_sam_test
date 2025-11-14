@@ -51,8 +51,8 @@ Resources:
           Required: false
           Mutable: true
       MfaConfiguration: "OPTIONAL"
-      EnabledMfaTypes:
-        - "SOFTWARE_TOKEN"
+      SoftwareTokenMfaConfiguration:
+        Enabled: true
       Policies:
         PasswordPolicy:
           MinimumLength: 8
