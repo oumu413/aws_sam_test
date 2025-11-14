@@ -51,8 +51,8 @@ Resources:
           Required: false
           Mutable: true
       MfaConfiguration: "OPTIONAL"
-      SoftwareTokenMfaConfiguration:
-        Enabled: true
+      EnabledMfas: 
+        - SOFTWARE_TOKEN_MFA #TOTPを有効化
       Policies:
         PasswordPolicy:
           MinimumLength: 8
