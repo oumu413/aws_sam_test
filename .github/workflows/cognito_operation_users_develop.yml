@@ -28,14 +28,14 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION_DEV }}
 
       - name: SAM Build
-        run: sam build --template-file cognit_operation_users.yml
+        run: sam build --template-file cognito_operation_users.yml
         working-directory: resources/cognito_operation_users
 
       - name: SAM Deploy
         run: |
           sam deploy \
-            --template-file cognit_operation_users.yml \
-            --config-file cognit_operation_users.toml \
+            --template-file cognito_operation_users.yml \
+            --config-file cognito_operation_users.toml \
             --config-env dev \
             --stack-name dev-${{ secrets.APP_NAME }}-cognito-operation-users \
             --parameter-overrides \
