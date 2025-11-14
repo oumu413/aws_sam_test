@@ -1,0 +1,111 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Template to setup cognito as part of bootstrap.
+
+Parameters:
+  Env:
+    Type: String
+    Default: dev
+  AppName:
+    Type: String
+    Default: test-attendance
+  DomainName:
+    Type: String
+
+Resources:
+  CognitoOperationUsersUserPool:
+    Type: "AWS::Cognito::UserPool"
+    Properties:
+      UserPoolName: !Sub ${Env}-${AppName}-operation-users-user-pool
+      AutoVerifiedAttributes:
+        - "email"
+      AccountRecoverySetting:
+        RecoveryMechanisms:
+          - Name: verified_email
+            Priority: 1
+      AdminCreateUserConfig:      
+        InviteMessageTemplate:
+          EmailMessage: !Join           
+            - ""
+            - - "Login into operations UI application at "
+              - "\n"
+              - "https://"
+              - "round-operations."
+              - !Ref DomainName
+              - "/"
+              - "\n\n"
+              - "Username: {username}"
+              - "\n"
+              - "Temporary password: {####}"
+          EmailSubject: !Join 
+            - ""
+            - - "Your temporary password for operations UI application"
+      Schema:
+        - AttributeDataType: "String"
+          Name: email
+          Required: true
+          Mutable: true
+        - AttributeDataType: "String"
+          Name: tenantId
+        - AttributeDataType: "String"
+          Name: userRole
+          Required: false
+          Mutable: true
+      MfaConfiguration: "OPTIONAL"
+      EnabledMfaTypes:
+        - "SOFTWARE_TOKEN"
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireUppercase: true
+          RequireLowercase: true
+          RequireNumbers: true
+          RequireSymbols: true
+        
+  CognitoOperationUsersUserPoolClient:
+    Type: "AWS::Cognito::UserPoolClient"
+    Properties:
+      ClientName: !Sub ${Env}-${AppName}-operation-users-pool-client
+      UserPoolId: !Ref CognitoOperationUsersUserPool
+      GenerateSecret: false
+      ExplicitAuthFlows:
+        - "ALLOW_USER_PASSWORD_AUTH"
+        - "ALLOW_REFRESH_TOKEN_AUTH"
+        - "ALLOW_USER_SRP_AUTH"
+      PreventUserExistenceErrors: ENABLED
+      AllowedOAuthFlowsUserPoolClient: true
+      AllowedOAuthFlows:
+        - code
+      SupportedIdentityProviders:
+        - COGNITO
+      CallbackURLs:
+        - !Join ["",["https://round-operations.", !Ref DomainName, "/"]]
+      LogoutURLs:  
+        - !Join ["",["https://round-operations.", !Ref DomainName, "/"]]
+      AllowedOAuthScopes:
+        - email
+        - openid
+        - profile
+      WriteAttributes:
+        - "email"
+        - "custom:tenantId"
+        - "custom:userRole"
+
+  CognitoOperationUserGroup:
+    Type: AWS::Cognito::UserPoolGroup
+    Properties:
+      GroupName: SystemAdmins
+      Description: Admin user group
+      Precedence: 0
+      UserPoolId: !Ref CognitoOperationUsersUserPool
+        
+Outputs:
+  CognitoOperationUsersUserPoolId:
+    Description: "Cognito Operation Users User Pool ID"
+    Value: !Ref CognitoOperationUsersUserPool
+    Export:
+      Name: !Sub ${Env}-${AppName}-Operations-UserPoolId
+  CognitoOperationUsersUserPoolClientId:
+    Description: "Cognito Operation Users User Pool Client ID"
+    Value: !Ref CognitoOperationUsersUserPoolClient
+    Export:
+      Name: !Sub ${Env}-${AppName}-Operations-UserPoolClientId

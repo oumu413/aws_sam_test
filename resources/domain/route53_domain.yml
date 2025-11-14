@@ -1,0 +1,10 @@
+Parameters:
+  DomainName:
+    Type: String
+    Default: "xxx.blog"
+    Description: "独自ドメイン名（例: xxx.blog）"
+  HostedZoneId:
+    Type: String
+    Default: "ZXXXXXXXXXXXXXX"
+    Description: "Route53のホストゾーンID"
+

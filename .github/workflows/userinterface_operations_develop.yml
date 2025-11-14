@@ -1,13 +1,13 @@
 
-name: Admin site distribution using S3 and CloudFront with AWS SAM (develop)
+name: Operations site distribution using S3 and CloudFront with AWS SAM (develop)
 
 on:
   push:
     branches:
       - develop   # 開発環境
     paths:
-    - frontend/admin/**
-    - resources/userinterface_admin/**
+    - frontend/operations/**
+    - resources/userinterface_operations/**
   workflow_dispatch:
     
 permissions:
@@ -29,17 +29,16 @@ jobs:
   
       - name: Install Dependencies
         run: npm install
-        working-directory: frontend/admin
+        working-directory: frontend/operations
 
       - name: Frontend Build
         run: npm run build
-        working-directory: frontend/admin
-
+        working-directory: frontend/operations
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: frontend-admin-build
-          path: frontend/admin/dist
+          name: frontend-operations-build
+          path: frontend/operations/dist
 
   ####### Deploy(CD) #######
   deploy:
@@ -52,7 +51,7 @@ jobs:
       - name: Download Build Artifact
         uses: actions/download-artifact@v4
         with:
-          name: frontend-admin-build
+          name: frontend-operations-build
           path: dist
         
       - name: Configure AWS Credentials
@@ -62,16 +61,16 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION_DEV }}
 
       - name: SAM Build
-        run: sam build --template-file userinterface_admin.yml
-        working-directory: resources/userinterface_admin
+        run: sam build --template-file userinterface_operations.yml
+        working-directory: resources/userinterface_operations
 
       - name: SAM Deploy
         run: |
           sam deploy \
-            --template-file userinterface_admin.yml \
-            --config-file userinterface_admin.toml \
+            --template-file userinterface_operations.yml \
+            --config-file userinterface_operations.toml \
             --config-env dev \
-            --stack-name dev-${{ secrets.APP_NAME }}-userinterface-admin \
+            --stack-name dev-${{ secrets.APP_NAME }}-userinterface-operations \
             --parameter-overrides \
               AppName=${{ secrets.APP_NAME }} \
               DomainName=${{ secrets.DOMAIN_NAME_DEV }} \
@@ -79,7 +78,7 @@ jobs:
               CertificateArn=${{ secrets.ACM_CERTIFICATE_ARN }} \
             --no-confirm-changeset \
             --no-fail-on-empty-changeset
-        working-directory: resources/userinterface_admin
+        working-directory: resources/userinterface_operations
 
       #- name: Upload to S3
-      #  run: aws s3 sync dist s3://dev-${{ secrets.APP_NAME }}-admin-site-bucket --delete  
+      #  run: aws s3 sync dist s3://dev-${{ secrets.APP_NAME }}-operations-site-bucket --delete  

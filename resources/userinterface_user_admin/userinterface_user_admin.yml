@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: S3 + CloudFront + Route53 A Record(Admin site)
+Description: S3 + CloudFront + Route53 A Record(user admin site)
 
 Parameters:
   Env:
@@ -16,10 +16,10 @@ Parameters:
     Type: String
 
 Resources:
-  AdminSiteCloudFrontDistributionLogBucket:
+  UserAdminSiteCloudFrontDistributionLogBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub ${Env}-${AppName}-admin-site-cf-log-bucket
+      BucketName: !Sub ${Env}-${AppName}-user-admin-site-cf-log-bucket
       OwnershipControls:
         Rules:
         - ObjectOwnership: BucketOwnerPreferred
@@ -35,11 +35,11 @@ Resources:
             Status: Enabled
             ExpirationInDays: 15
 
-  AdminSiteBucket:
+  UserAdminSiteBucket:
     Type: AWS::S3::Bucket
     #DeletionPolicy: Retain
     Properties:
-      BucketName: !Sub ${Env}-${AppName}-admin-site-bucket
+      BucketName: !Sub ${Env}-${AppName}-user-admin-site-bucket
       BucketEncryption:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
@@ -50,50 +50,50 @@ Resources:
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
 
-  AdminSiteBucketPolicy:
+  UserAdminSiteBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
-      Bucket: !Ref AdminSiteBucket
+      Bucket: !Ref UserAdminSiteBucket
       PolicyDocument:
         Statement:
           - Action: s3:GetObject
             Effect: Allow
-            Resource: !Sub arn:aws:s3:::${AdminSiteBucket}/*
+            Resource: !Sub arn:aws:s3:::${UserAdminSiteBucket}/*
             Principal:
               Service: cloudfront.amazonaws.com
             Condition:
               StringEquals:
-                AWS:SourceArn: !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/${AdminSiteCloudFrontDistribution}
+                AWS:SourceArn: !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/${UserAdminSiteCloudFrontDistribution}
           #- Action: s3:ListBucket
           #  Effect: Allow
-          #  Resource: !Sub arn:aws:s3:::${AdminSiteBucket}
+          #  Resource: !Sub arn:aws:s3:::${UserAdminSiteBucket}
           #  Principal:
           #    Service: cloudfront.amazonaws.com
           #  Condition:
           #    StringEquals:
-          #      AWS:SourceArn: !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/${AdminSiteCloudFrontDistribution}
+          #      AWS:SourceArn: !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/${UserAdminSiteCloudFrontDistribution}
 
-  AdminSiteCloudFrontDistribution:
+  UserAdminSiteCloudFrontDistribution:
     Type: AWS::CloudFront::Distribution
     Properties:
       DistributionConfig:
         Aliases:
-          - !Sub roundadmin.${DomainName}
+          - !Sub "*.${DomainName}"
         PriceClass: PriceClass_200
         Origins:
-          - Id: AdminSiteOrigin
-            DomainName: !Sub ${AdminSiteBucket}.s3.${AWS::Region}.amazonaws.com
-            OriginAccessControlId: !GetAtt OACAdminSite.Id
+          - Id: UserAdminSiteOrigin
+            DomainName: !Sub ${UserAdminSiteBucket}.s3.${AWS::Region}.amazonaws.com
+            OriginAccessControlId: !GetAtt OACUserAdminSite.Id
             S3OriginConfig: {}
         Enabled: true
         DefaultRootObject: index.html
         Logging:
           IncludeCookies: false
-          Bucket: !Sub ${AdminSiteCloudFrontDistributionLogBucket}.s3.${AWS::Region}.amazonaws.com
-          Prefix: !Sub ${Env}-${AppName}-admin-site-distribution/
-        Comment: !Sub ${Env}-${AppName}-admin-site-distribution
+          Bucket: !Sub ${UserAdminSiteCloudFrontDistributionLogBucket}.s3.${AWS::Region}.amazonaws.com
+          Prefix: !Sub ${Env}-${AppName}-user-admin-site-distribution/
+        Comment: !Sub ${Env}-${AppName}-user-admin-site-distribution
         DefaultCacheBehavior:
-          TargetOriginId: AdminSiteOrigin
+          TargetOriginId: UserAdminSiteOrigin
           ViewerProtocolPolicy: redirect-to-https
           AllowedMethods:
             - HEAD
@@ -108,7 +108,7 @@ Resources:
             QueryString: false
         CacheBehaviors:
           - PathPattern: "/assets/*"
-            TargetOriginId: AdminSiteOrigin
+            TargetOriginId: UserAdminSiteOrigin
             ViewerProtocolPolicy: redirect-to-https
             AllowedMethods:
               - GET
@@ -136,29 +136,19 @@ Resources:
           MinimumProtocolVersion: TLSv1.2_2021
         IPV6Enabled: false
  
-  OACAdminSite:
+  OACUserAdminSite:
     Type: AWS::CloudFront::OriginAccessControl
     Properties:
       OriginAccessControlConfig:
-        Description: !Sub ${Env}-${AppName}-admin-site-oac
-        Name: !Sub ${Env}-${AppName}-admin-site-oac
+        Description: !Sub ${Env}-${AppName}-user-admin-site-oac
+        Name: !Sub ${Env}-${AppName}-user-admin-site-oac
         OriginAccessControlOriginType: s3
         SigningBehavior: always
         SigningProtocol: sigv4
-  
-  Route53RecordSet:
-    Type: AWS::Route53::RecordSet
-    Properties:
-      HostedZoneId: !Ref HostedZoneId
-      Name: !Sub roundadmin.${DomainName}
-      Type: A
-      AliasTarget:
-        HostedZoneId: Z2FDTNDATAQYW2 #　CloudFront Hosted Zone ID (固定値)
-        DNSName: !GetAtt AdminSiteCloudFrontDistribution.DomainName
 
 Outputs:
-  AdminSiteCloudFrontDistributionDomain:
-    Value: !GetAtt AdminSiteCloudFrontDistribution.DomainName
+  UserAdminSiteCloudFrontDistributionDomain:
+    Value: !GetAtt UserAdminSiteCloudFrontDistribution.DomainName
     Description: CloudFront Domain Name
     Export:
-      Name: Admin-Site-CloudFrontDomainName
+      Name: User-Admin-Site-CloudFrontDomainName

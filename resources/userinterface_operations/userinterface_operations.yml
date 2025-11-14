@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: S3 + CloudFront + Route53 A Record(App site)
+Description: S3 + CloudFront + Route53 A Record(Operations site)
 
 Parameters:
   Env:
@@ -16,10 +16,10 @@ Parameters:
     Type: String
 
 Resources:
-  AppSiteCloudFrontDistributionLogBucket:
+  OperationsSiteCloudFrontDistributionLogBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub ${Env}-${AppName}-app-site-cf-log-bucket
+      BucketName: !Sub ${Env}-${AppName}-operations-site-cf-log-bucket
       OwnershipControls:
         Rules:
         - ObjectOwnership: BucketOwnerPreferred
@@ -35,11 +35,11 @@ Resources:
             Status: Enabled
             ExpirationInDays: 15
 
-  AppSiteBucket:
+  OperationsSiteBucket:
     Type: AWS::S3::Bucket
     #DeletionPolicy: Retain
     Properties:
-      BucketName: !Sub ${Env}-${AppName}-app-site-bucket
+      BucketName: !Sub ${Env}-${AppName}-operations-site-bucket
       BucketEncryption:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
@@ -50,50 +50,50 @@ Resources:
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
 
-  AppSiteBucketPolicy:
+  OperationsSiteBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
-      Bucket: !Ref AppSiteBucket
+      Bucket: !Ref OperationsSiteBucket
       PolicyDocument:
         Statement:
           - Action: s3:GetObject
             Effect: Allow
-            Resource: !Sub arn:aws:s3:::${AppSiteBucket}/*
+            Resource: !Sub arn:aws:s3:::${OperationsSiteBucket}/*
             Principal:
               Service: cloudfront.amazonaws.com
             Condition:
               StringEquals:
-                AWS:SourceArn: !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/${AppSiteCloudFrontDistribution}
+                AWS:SourceArn: !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/${OperationsSiteCloudFrontDistribution}
           #- Action: s3:ListBucket
           #  Effect: Allow
-          #  Resource: !Sub arn:aws:s3:::${AppSiteBucket}
+          #  Resource: !Sub arn:aws:s3:::${OperationsSiteBucket}
           #  Principal:
           #    Service: cloudfront.amazonaws.com
           #  Condition:
           #    StringEquals:
-          #      AWS:SourceArn: !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/${AppSiteCloudFrontDistribution}
+          #      AWS:SourceArn: !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/${OperationsSiteCloudFrontDistribution}
 
-  AppSiteCloudFrontDistribution:
+  OperationsSiteCloudFrontDistribution:
     Type: AWS::CloudFront::Distribution
     Properties:
       DistributionConfig:
         Aliases:
-          - !Sub "*.${DomainName}"
+          - !Sub round-operations.${DomainName}
         PriceClass: PriceClass_200
         Origins:
-          - Id: AppSiteOrigin
-            DomainName: !Sub ${AppSiteBucket}.s3.${AWS::Region}.amazonaws.com
-            OriginAccessControlId: !GetAtt OACAppSite.Id
+          - Id: OperationsSiteOrigin
+            DomainName: !Sub ${OperationsSiteBucket}.s3.${AWS::Region}.amazonaws.com
+            OriginAccessControlId: !GetAtt OACOperationsSite.Id
             S3OriginConfig: {}
         Enabled: true
         DefaultRootObject: index.html
         Logging:
           IncludeCookies: false
-          Bucket: !Sub ${AppSiteCloudFrontDistributionLogBucket}.s3.${AWS::Region}.amazonaws.com
-          Prefix: !Sub ${Env}-${AppName}-app-site-distribution/
-        Comment: !Sub ${Env}-${AppName}-app-site-distribution
+          Bucket: !Sub ${OperationsSiteCloudFrontDistributionLogBucket}.s3.${AWS::Region}.amazonaws.com
+          Prefix: !Sub ${Env}-${AppName}-operations-site-distribution/
+        Comment: !Sub ${Env}-${AppName}-operations-site-distribution
         DefaultCacheBehavior:
-          TargetOriginId: AppSiteOrigin
+          TargetOriginId: OperationsSiteOrigin
           ViewerProtocolPolicy: redirect-to-https
           AllowedMethods:
             - HEAD
@@ -108,7 +108,7 @@ Resources:
             QueryString: false
         CacheBehaviors:
           - PathPattern: "/assets/*"
-            TargetOriginId: AppSiteOrigin
+            TargetOriginId: OperationsSiteOrigin
             ViewerProtocolPolicy: redirect-to-https
             AllowedMethods:
               - GET
@@ -136,19 +136,28 @@ Resources:
           MinimumProtocolVersion: TLSv1.2_2021
         IPV6Enabled: false
  
-  OACAppSite:
+  OACOperationsSite:
     Type: AWS::CloudFront::OriginAccessControl
     Properties:
       OriginAccessControlConfig:
-        Description: !Sub ${Env}-${AppName}-app-site-oac
-        Name: !Sub ${Env}-${AppName}-app-site-oac
+        Description: !Sub ${Env}-${AppName}-operations-site-oac
+        Name: !Sub ${Env}-${AppName}-operations-site-oac
         OriginAccessControlOriginType: s3
         SigningBehavior: always
         SigningProtocol: sigv4
-
+  
+  Route53RecordSet:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref HostedZoneId
+      Name: !Sub round-operations.${DomainName}
+      Type: A
+      AliasTarget:
+        HostedZoneId: Z2FDTNDATAQYW2 #　CloudFront Hosted Zone ID (固定値)
+        DNSName: !GetAtt OperationsSiteCloudFrontDistribution.DomainName
 Outputs:
-  AppSiteCloudFrontDistributionDomain:
-    Value: !GetAtt AppSiteCloudFrontDistribution.DomainName
+  OperationsSiteCloudFrontDistributionDomain:
+    Value: !GetAtt OperationsSiteCloudFrontDistribution.DomainName
     Description: CloudFront Domain Name
     Export:
-      Name: App-Site-CloudFrontDomainName
+      Name: Operations-Site-CloudFrontDomainName
