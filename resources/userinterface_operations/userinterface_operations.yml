@@ -146,7 +146,7 @@ Resources:
         SigningBehavior: always
         SigningProtocol: sigv4
   
-  Route53RecordSet:
+  Route53OperationsSiteRecordSet:
     Type: AWS::Route53::RecordSet
     Properties:
       HostedZoneId: !Ref HostedZoneId

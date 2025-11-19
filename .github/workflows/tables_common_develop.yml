@@ -1,0 +1,46 @@
+
+name: Tables common (develop)
+
+on:
+  push:
+    branches:
+      - develop   # 開発環境
+    paths:
+    - resources/tables_common/**
+  workflow_dispatch:
+    
+permissions:
+  id-token: write
+  contents: read
+  
+jobs:
+  ####### Deploy(CD) #######
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN_DEV }}
+          aws-region: ${{ secrets.AWS_REGION_DEV }}
+
+      - name: SAM Build
+        run: sam build --template-file tables_common.yml
+        working-directory: resources/tables_common
+
+      - name: SAM Deploy
+        run: |
+          sam deploy \
+            --template-file tables_common.yml \
+            --config-file tables_common.toml \
+            --config-env dev \
+            --stack-name dev-${{ secrets.APP_NAME }}-tables-common \
+            --parameter-overrides \
+              AppName=${{ secrets.APP_NAME }} \
+              DomainName=${{ secrets.DOMAIN_NAME_DEV }} \
+            --no-confirm-changeset \
+            --no-fail-on-empty-changeset
+        working-directory: resources/tables_common

@@ -1,0 +1,100 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: dynamdb tables for common uses
+
+Parameters:
+  Env:
+    Type: String
+    Default: dev
+  AppName:
+    Type: String
+    Default: test-attendance
+  DomainName:
+    Type: String
+
+Resources:
+  TenantDetailsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: tenantId
+          AttributeType: S
+        - AttributeName: tenantName
+          AttributeType: S
+        - AttributeName: authCode
+          AttributeType: S
+        - AttributeName: subDomain
+          AttributeType: S  
+      KeySchema:
+        - AttributeName: tenantId
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+      GlobalSecondaryIndexes:
+        - IndexName: !Sub ${Env}-${AppName}-TenantConfig
+          KeySchema:
+            - AttributeName: tenantName
+              KeyType: HASH
+          Projection:
+            NonKeyAttributes: 
+              - userPoolId
+              - appClientId
+              - apiGatewayUrl
+              - contractCount
+              - status
+              - authCode
+              - subDomain
+            ProjectionType: INCLUDE
+        - IndexName: !Sub ${Env}-${AppName}-AuthCodeIndex
+          KeySchema:
+            - AttributeName: authCode
+              KeyType: HASH
+          Projection:
+            NonKeyAttributes:
+              - userPoolId
+              - appClientId
+              - apiGatewayUrl
+            ProjectionType: INCLUDE
+        - IndexName: !Sub ${Env}-${AppName}-SubDomainIndex
+          KeySchema:
+            - AttributeName: subDomain
+              KeyType: HASH
+          Projection:
+            NonKeyAttributes:
+              - userPoolId
+              - appClientId
+              - apiGatewayUrl
+            ProjectionType: INCLUDE
+      TableName: !Sub ${Env}-${AppName}-tenant-details
+
+#  TenantUserMappingTable:
+#    Type: AWS::DynamoDB::Table
+#    Properties:
+#      AttributeDefinitions:
+#        - AttributeName: tenantId
+#          AttributeType: S
+#        - AttributeName: userName
+#          AttributeType: S
+#      KeySchema:
+#        - AttributeName: tenantId
+#          KeyType: HASH
+#        - AttributeName: userName
+#          KeyType: RANGE
+#      BillingMode: PAY_PER_REQUEST 
+#      TableName: ServerlessSaaS-TenantUserMapping
+#      GlobalSecondaryIndexes: 
+#        - IndexName: UserName
+#          KeySchema: 
+#            - AttributeName: userName
+#              KeyType: HASH
+#            - AttributeName: tenantId
+#              KeyType: RANGE
+#          Projection:
+#            ProjectionType: ALL          
+Outputs:
+  TenantDetailsTableArn: 
+    Value: !GetAtt TenantDetailsTable.Arn
+  TenantDetailsTableName: 
+    Value: !Ref TenantDetailsTable
+#  TenantUserMappingTableArn: 
+#    Value: !GetAtt TenantUserMappingTable.Arn
+#  TenantUserMappingTableName: 
+#    Value: !Ref TenantUserMappingTable
