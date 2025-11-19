@@ -38,7 +38,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: frontend-user-build
-          path: frontend/dist
+          path: frontend/user/dist
 
   ####### Deploy(CD) #######
   deploy:
