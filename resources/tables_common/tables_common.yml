@@ -88,12 +88,16 @@ Resources:
 #            - AttributeName: tenantId
 #              KeyType: RANGE
 #          Projection:
-#            ProjectionType: ALL          
+#            ProjectionType: ALL
 Outputs:
   TenantDetailsTableArn: 
     Value: !GetAtt TenantDetailsTable.Arn
+    Export:
+      Name: !Sub ${Env}-${AppName}-TenantDetailsTableArn
   TenantDetailsTableName: 
     Value: !Ref TenantDetailsTable
+    Export:
+      Name: !Sub ${Env}-${AppName}-TenantDetailsTableName
 #  TenantUserMappingTableArn: 
 #    Value: !GetAtt TenantUserMappingTable.Arn
 #  TenantUserMappingTableName: 
