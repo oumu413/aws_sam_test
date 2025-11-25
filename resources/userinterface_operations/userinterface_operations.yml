@@ -84,7 +84,6 @@ Resources:
         Logging:
           IncludeCookies: false
           Bucket: !Sub ${OperationsSiteCloudFrontDistributionLogBucket}.s3.${AWS::Region}.amazonaws.com
-          Prefix: /
         Comment: !Sub operations-site-distribution
         DefaultCacheBehavior:
           TargetOriginId: OperationsSiteOrigin

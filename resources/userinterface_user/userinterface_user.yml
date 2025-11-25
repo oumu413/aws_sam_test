@@ -82,7 +82,6 @@ Resources:
         Logging:
           IncludeCookies: false
           Bucket: !Sub ${UserSiteCloudFrontDistributionLogBucket}.s3.${AWS::Region}.amazonaws.com
-          Prefix: /
         Comment: user-site-distribution
         DefaultCacheBehavior:
           TargetOriginId: UserSiteOrigin
