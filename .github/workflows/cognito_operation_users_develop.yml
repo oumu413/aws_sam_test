@@ -37,7 +37,7 @@ jobs:
             --template-file cognito_operation_users.yml \
             --config-file cognito_operation_users.toml \
             --config-env dev \
-            --stack-name dev-${{ secrets.APP_NAME }}-cognito-operation-users \
+            --stack-name cognito-operation-users \
             --parameter-overrides \
               DomainName=${{ secrets.DOMAIN_NAME_DEV }} \
             --no-confirm-changeset \

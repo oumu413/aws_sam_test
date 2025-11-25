@@ -37,7 +37,7 @@ jobs:
             --template-file tables_common.yml \
             --config-file tables_common.toml \
             --config-env dev \
-            --stack-name dev-${{ secrets.APP_NAME }}-tables-common \
+            --stack-name tables-common \
             --no-confirm-changeset \
             --no-fail-on-empty-changeset
         working-directory: resources/tables_common

@@ -70,7 +70,7 @@ jobs:
             --template-file userinterface_user.yml \
             --config-file userinterface_user.toml \
             --config-env dev \
-            --stack-name dev-${{ secrets.APP_NAME }}-userinterface-user \
+            --stack-name userinterface-user \
             --parameter-overrides \
               DomainName=${{ secrets.DOMAIN_NAME_DEV }} \
               CertificateArn=${{ secrets.ACM_CERTIFICATE_ARN }} \
