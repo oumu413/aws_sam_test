@@ -38,9 +38,6 @@ jobs:
             --config-file tables_common.toml \
             --config-env dev \
             --stack-name dev-${{ secrets.APP_NAME }}-tables-common \
-            --parameter-overrides \
-              AppName=${{ secrets.APP_NAME }} \
-              DomainName=${{ secrets.DOMAIN_NAME_DEV }} \
             --no-confirm-changeset \
             --no-fail-on-empty-changeset
         working-directory: resources/tables_common

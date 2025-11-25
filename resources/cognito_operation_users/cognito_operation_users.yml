@@ -2,12 +2,6 @@ AWSTemplateFormatVersion: 2010-09-09
 Description: cognito operation users user pool
 
 Parameters:
-  Env:
-    Type: String
-    Default: dev
-  AppName:
-    Type: String
-    Default: test-attendance
   DomainName:
     Type: String
 
@@ -15,7 +9,7 @@ Resources:
   CognitoOperationUsersUserPool:
     Type: "AWS::Cognito::UserPool"
     Properties:
-      UserPoolName: !Sub ${Env}-${AppName}-operation-users-user-pool
+      UserPoolName: !Sub operation-users-user-pool
       AutoVerifiedAttributes:
         - "email"
       AccountRecoverySetting:
@@ -64,7 +58,7 @@ Resources:
   CognitoOperationUsersUserPoolClient:
     Type: "AWS::Cognito::UserPoolClient"
     Properties:
-      ClientName: !Sub ${Env}-${AppName}-operation-users-pool-client
+      ClientName: !Sub operation-users-pool-client
       UserPoolId: !Ref CognitoOperationUsersUserPool
       GenerateSecret: false
       ExplicitAuthFlows:
@@ -103,9 +97,9 @@ Outputs:
     Description: "Cognito Operation Users User Pool ID"
     Value: !Ref CognitoOperationUsersUserPool
     Export:
-      Name: !Sub ${Env}-${AppName}-Operations-UserPoolId
+      Name: !Sub Operations-UserPoolId
   CognitoOperationUsersUserPoolClientId:
     Description: "Cognito Operation Users User Pool Client ID"
     Value: !Ref CognitoOperationUsersUserPoolClient
     Export:
-      Name: !Sub ${Env}-${AppName}-Operations-UserPoolClientId
+      Name: !Sub Operations-UserPoolClientId

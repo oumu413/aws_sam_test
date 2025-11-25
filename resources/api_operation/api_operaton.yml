@@ -6,100 +6,35 @@ Transform: AWS::Serverless-2016-10-31
 Description: >
   Template to Bootstrap the Common Resources
 Parameters:
-  AdminEmailParameter:
+  Env:
     Type: String
-    Default: "test@test.com"
-    Description: "Enter system admin email address"
-  SystemAdminRoleNameParameter:
+    Default: dev
+  AppName:
     Type: String
-    Default: "SystemAdmin"
-    Description: "Enter the role name for system admin"
-  ApiKeyOperationUsersParameter:
+    Default: test-attendance
+  DomainName:
     Type: String
-    Default: "9a7743fa-3ae7-11eb-adc1-0242ac120002"
-    Description: "Enter default api key value to be used by api gateway for system admins"
-  ApiKeyPlatinumTierParameter:
+  TenantDetailsTableArn:
     Type: String
-    Default: "88b43c36-802e-11eb-af35-38f9d35b2c15"
-    Description: "Enter default api key value to be used by api gateway for platinum tier tenants"
-  ApiKeyPremiumTierParameter:
+    Default: !ImportValue !Sub ${Env}-${AppName}-TenantDetailsTableArn
+  TenantDetailsTableName:
     Type: String
-    Default: "6db2bdc2-6d96-11eb-a56f-38f9d33cfd0f"
-    Description: "Enter default api key value to be used by api gateway for premium tier tenants"
-  ApiKeyStandardTierParameter:
-    Type: String
-    Default: "b1c735d8-6d96-11eb-a28b-38f9d33cfd0f"
-    Description: "Enter default api key value to be used by api gateway for standard tier tenants"
-  ApiKeyBasicTierParameter:
-    Type: String
-    Default: "daae9784-6d96-11eb-a28b-38f9d33cfd0f"
-    Description: "Enter default api key value to be used by api gateway for basic tier tenants"  
-  StageName:
-    Type: String
-    Default: "prod"
-    Description: "Stage Name for the api"  
-  EventEngineParameter:
-    Type: String
-    Default: false    
-    Description: "Tells if this workshop is running as a part of AWS Event through AWS EventEngine or not"
-  AdminUserPoolCallbackURLParameter: 
-    Type: String
-    Default: "http://example.com"
-    Description: "Enter Admin Management userpool call back url"  
-  TenantUserPoolCallbackURLParameter:
-    Type: String
-    Default: "http://example.com"
-    Description: "Enter Tenant Management userpool call back url"   
-Conditions:
-  IsNotRunningInEventEngine: !Not [ !Equals [ !Ref EventEngineParameter, true] ]
-Resources:
-  DynamoDBTables:
-    Type: AWS::Serverless::Application
-    Properties:
-      Location: nested_templates/tables.yaml
+    Default: !ImportValue !Sub ${Env}-${AppName}-TenantDetailsTableName
 
-  #Create cloudfront and s3 for UI Cde
-  UserInterface:
-    Type: AWS::Serverless::Application
-    Properties:
-      Location: nested_templates/userinterface.yaml
-      Parameters:
-        IsCloudFrontAndS3PreProvisioned: !Ref EventEngineParameter
-      
-  Cognito:
-    Type: AWS::Serverless::Application
-    DependsOn: UserInterface
-    Properties:
-      Location: nested_templates/cognito.yaml
-      Parameters:
-        AdminEmailParameter: !Ref AdminEmailParameter
-        SystemAdminRoleNameParameter: !Ref SystemAdminRoleNameParameter
-        AdminUserPoolCallbackURLParameter: !If [IsNotRunningInEventEngine, !GetAtt UserInterface.Outputs.AdminAppSite, !Ref AdminUserPoolCallbackURLParameter]
-        TenantUserPoolCallbackURLParameter: !If [IsNotRunningInEventEngine, !GetAtt UserInterface.Outputs.ApplicationSite, !Ref TenantUserPoolCallbackURLParameter]
-        
+Resources:
+
   LambdaFunctions:
     Type: AWS::Serverless::Application
     DependsOn: UserInterface
     Properties:
       Location: nested_templates/lambdafunctions.yaml
       Parameters:
-        CognitoUserPoolId: !GetAtt Cognito.Outputs.CognitoUserPoolId
-        CognitoUserPoolClientId: !GetAtt Cognito.Outputs.CognitoUserPoolClientId                
-        CognitoOperationUsersUserPoolId: !GetAtt Cognito.Outputs.CognitoOperationUsersUserPoolId
-        CognitoOperationUsersUserPoolClientId: !GetAtt Cognito.Outputs.CognitoOperationUsersUserPoolClientId
-        TenantDetailsTableArn: !GetAtt DynamoDBTables.Outputs.TenantDetailsTableArn
-        ServerlessSaaSSettingsTableArn: !GetAtt DynamoDBTables.Outputs.ServerlessSaaSSettingsTableArn
-        ApiKeyOperationUsersParameter: !Ref ApiKeyOperationUsersParameter
-        ApiKeyPlatinumTierParameter: !Ref ApiKeyPlatinumTierParameter
-        ApiKeyPremiumTierParameter: !Ref ApiKeyPremiumTierParameter
-        ApiKeyStandardTierParameter: !Ref ApiKeyStandardTierParameter
-        ApiKeyBasicTierParameter: !Ref ApiKeyBasicTierParameter
-        TenantStackMappingTableArn: !GetAtt DynamoDBTables.Outputs.TenantStackMappingTableArn
-        TenantUserMappingTableArn: !GetAtt DynamoDBTables.Outputs.TenantUserMappingTableArn
-        TenantStackMappingTableName: !GetAtt DynamoDBTables.Outputs.TenantStackMappingTableName
-        TenantUserPoolCallbackURLParameter: !If [IsNotRunningInEventEngine, !GetAtt UserInterface.Outputs.ApplicationSite, !Ref TenantUserPoolCallbackURLParameter]
-        
-        
+        Env: !Ref Env
+        AppName: !Ref AppName
+        DomainName: !Ref DomainName
+        TenantDetailsTableArn: !Ref TenantDetailsTableArn
+        TenantDetailsTableName: !Ref TenantDetailsTableName
+
   APIs:
     Type: AWS::Serverless::Application
     DependsOn: LambdaFunctions

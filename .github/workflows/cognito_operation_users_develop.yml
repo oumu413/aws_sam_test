@@ -39,7 +39,6 @@ jobs:
             --config-env dev \
             --stack-name dev-${{ secrets.APP_NAME }}-cognito-operation-users \
             --parameter-overrides \
-              AppName=${{ secrets.APP_NAME }} \
               DomainName=${{ secrets.DOMAIN_NAME_DEV }} \
             --no-confirm-changeset \
             --no-fail-on-empty-changeset

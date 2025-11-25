@@ -2,12 +2,6 @@ AWSTemplateFormatVersion: 2010-09-09
 Description: S3 + CloudFront + Route53 A Record(Operations site)
 
 Parameters:
-  Env:
-    Type: String
-    Default: dev
-  AppName:
-    Type: String
-    Default: test-attendance
   DomainName:
     Type: String
   HostedZoneId:
@@ -19,7 +13,7 @@ Resources:
   OperationsSiteCloudFrontDistributionLogBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub ${Env}-${AppName}-operations-site-cf-log-bucket
+      BucketName: operations-site-cf-log-bucket
       OwnershipControls:
         Rules:
         - ObjectOwnership: BucketOwnerPreferred
@@ -39,7 +33,7 @@ Resources:
     Type: AWS::S3::Bucket
     #DeletionPolicy: Retain
     Properties:
-      BucketName: !Sub ${Env}-${AppName}-operations-site-bucket
+      BucketName: operations-site-bucket
       BucketEncryption:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
@@ -90,8 +84,8 @@ Resources:
         Logging:
           IncludeCookies: false
           Bucket: !Sub ${OperationsSiteCloudFrontDistributionLogBucket}.s3.${AWS::Region}.amazonaws.com
-          Prefix: !Sub ${Env}-${AppName}-operations-site-distribution/
-        Comment: !Sub ${Env}-${AppName}-operations-site-distribution
+          Prefix: /
+        Comment: !Sub operations-site-distribution
         DefaultCacheBehavior:
           TargetOriginId: OperationsSiteOrigin
           ViewerProtocolPolicy: redirect-to-https
@@ -140,8 +134,8 @@ Resources:
     Type: AWS::CloudFront::OriginAccessControl
     Properties:
       OriginAccessControlConfig:
-        Description: !Sub ${Env}-${AppName}-operations-site-oac
-        Name: !Sub ${Env}-${AppName}-operations-site-oac
+        Description: !Sub operations-site-oac
+        Name: !Sub operations-site-oac
         OriginAccessControlOriginType: s3
         SigningBehavior: always
         SigningProtocol: sigv4
