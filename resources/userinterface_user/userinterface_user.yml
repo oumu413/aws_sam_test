@@ -10,24 +10,24 @@ Parameters:
     Type: String
 
 Resources:
-  UserSiteCloudFrontDistributionLogBucket:
-    Type: AWS::S3::Bucket
-    Properties:
-      BucketName: !Sub ${AppName}-user-site-cf-log-bucket
-      OwnershipControls:
-        Rules:
-        - ObjectOwnership: BucketOwnerPreferred
-      #AccessControl: LogDeliveryWrite
-      PublicAccessBlockConfiguration:
-        BlockPublicAcls: true
-        BlockPublicPolicy: true
-        IgnorePublicAcls: true
-        RestrictPublicBuckets: true
-      LifecycleConfiguration:
-        Rules:
-          - Id: AutoDelete
-            Status: Enabled
-            ExpirationInDays: 15
+  #UserSiteCloudFrontDistributionLogBucket:
+  #  Type: AWS::S3::Bucket
+  #  Properties:
+  #    BucketName: !Sub ${AppName}-user-site-cf-log-bucket
+  #    OwnershipControls:
+  #      Rules:
+  #      - ObjectOwnership: BucketOwnerPreferred
+  #    #AccessControl: LogDeliveryWrite
+  #    PublicAccessBlockConfiguration:
+  #      BlockPublicAcls: true
+  #      BlockPublicPolicy: true
+  #      IgnorePublicAcls: true
+  #      RestrictPublicBuckets: true
+  #    LifecycleConfiguration:
+  #      Rules:
+  #        - Id: AutoDelete
+  #          Status: Enabled
+  #          ExpirationInDays: 15
 
   UserSiteBucket:
     Type: AWS::S3::Bucket
@@ -81,10 +81,10 @@ Resources:
             S3OriginConfig: {}
         Enabled: true
         DefaultRootObject: index.html
-        Logging:
-          IncludeCookies: false
-          Bucket: !Sub ${UserSiteCloudFrontDistributionLogBucket}.s3.${AWS::Region}.amazonaws.com
-        Comment: user-site-distribution
+        #Logging:
+        #  IncludeCookies: false
+        #  Bucket: !Sub ${UserSiteCloudFrontDistributionLogBucket}.s3.${AWS::Region}.amazonaws.com
+        #Comment: user-site-distribution
         DefaultCacheBehavior:
           TargetOriginId: UserSiteOrigin
           ViewerProtocolPolicy: redirect-to-https
@@ -94,11 +94,7 @@ Resources:
           CachedMethods:
             - HEAD
             - GET
-          DefaultTTL: 0
-          MaxTTL: 0
-          MinTTL: 0
-          ForwardedValues:
-            QueryString: false
+          CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad # CachingDisabled
         CacheBehaviors:
           - PathPattern: "/assets/*"
             TargetOriginId: UserSiteOrigin
@@ -109,11 +105,7 @@ Resources:
             CachedMethods:
               - GET
               - HEAD
-            DefaultTTL: 86400
-            MaxTTL: 31536000
-            MinTTL: 0
-            ForwardedValues:
-              QueryString: false
+            CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad # CachingDisabled
         CustomErrorResponses:
           - ErrorCachingMinTTL: 0
             ErrorCode: 403
