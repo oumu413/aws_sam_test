@@ -2,6 +2,8 @@ AWSTemplateFormatVersion: 2010-09-09
 Description: S3 + CloudFront + Route53 A Record(Operations site)
 
 Parameters:
+  AppName:
+    Type: String
   DomainName:
     Type: String
   HostedZoneId:
@@ -10,30 +12,30 @@ Parameters:
     Type: String
 
 Resources:
-  OperationsSiteCloudFrontDistributionLogBucket:
-    Type: AWS::S3::Bucket
-    Properties:
-      BucketName: operations-site-cf-log-bucket
-      OwnershipControls:
-        Rules:
-        - ObjectOwnership: BucketOwnerPreferred
-      #AccessControl: LogDeliveryWrite
-      PublicAccessBlockConfiguration:
-        BlockPublicAcls: true
-        BlockPublicPolicy: true
-        IgnorePublicAcls: true
-        RestrictPublicBuckets: true
-      LifecycleConfiguration:
-        Rules:
-          - Id: AutoDelete
-            Status: Enabled
-            ExpirationInDays: 15
+  #OperationsSiteCloudFrontDistributionLogBucket:
+  #  Type: AWS::S3::Bucket
+  #  Properties:
+  #    BucketName: !Sub ${AppName}-operations-site-cf-log-bucket
+  #    OwnershipControls:
+  #      Rules:
+  #      - ObjectOwnership: BucketOwnerPreferred
+  #    #AccessControl: LogDeliveryWrite
+  #    PublicAccessBlockConfiguration:
+  #      BlockPublicAcls: true
+  #      BlockPublicPolicy: true
+  #      IgnorePublicAcls: true
+  #      RestrictPublicBuckets: true
+  #    LifecycleConfiguration:
+  #      Rules:
+  #        - Id: AutoDelete
+  #          Status: Enabled
+  #          ExpirationInDays: 15
 
   OperationsSiteBucket:
     Type: AWS::S3::Bucket
     #DeletionPolicy: Retain
     Properties:
-      BucketName: operations-site-bucket
+      BucketName: !Sub ${AppName}-operations-site-bucket
       BucketEncryption:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
@@ -81,9 +83,9 @@ Resources:
             S3OriginConfig: {}
         Enabled: true
         DefaultRootObject: index.html
-        Logging:
-          IncludeCookies: false
-          Bucket: !Sub ${OperationsSiteCloudFrontDistributionLogBucket}.s3.${AWS::Region}.amazonaws.com
+        #Logging:
+        #  IncludeCookies: false
+        #  Bucket: !Sub ${OperationsSiteCloudFrontDistributionLogBucket}.s3.${AWS::Region}.amazonaws.com
         Comment: !Sub operations-site-distribution
         DefaultCacheBehavior:
           TargetOriginId: OperationsSiteOrigin
@@ -94,11 +96,7 @@ Resources:
           CachedMethods:
             - HEAD
             - GET
-          DefaultTTL: 0
-          MaxTTL: 0
-          MinTTL: 0
-          ForwardedValues:
-            QueryString: false
+          CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad # CachingDisabled
         CacheBehaviors:
           - PathPattern: "/assets/*"
             TargetOriginId: OperationsSiteOrigin
@@ -109,11 +107,7 @@ Resources:
             CachedMethods:
               - GET
               - HEAD
-            DefaultTTL: 86400
-            MaxTTL: 31536000
-            MinTTL: 0
-            ForwardedValues:
-              QueryString: false
+            CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad # CachingDisabled
         CustomErrorResponses:
           - ErrorCachingMinTTL: 0
             ErrorCode: 403
@@ -128,6 +122,7 @@ Resources:
           SslSupportMethod: sni-only
           MinimumProtocolVersion: TLSv1.2_2021
         IPV6Enabled: false
+        HttpVersion: http1.1 | http2
  
   OACOperationsSite:
     Type: AWS::CloudFront::OriginAccessControl

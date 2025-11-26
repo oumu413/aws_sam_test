@@ -2,6 +2,8 @@ AWSTemplateFormatVersion: 2010-09-09
 Description: S3 + CloudFront + Route53 A Record(user site)
 
 Parameters:
+  AppName:
+    Type: String
   DomainName:
     Type: String
   CertificateArn:
@@ -11,7 +13,7 @@ Resources:
   UserSiteCloudFrontDistributionLogBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: user-site-cf-log-bucket
+      BucketName: !Sub ${AppName}-user-site-cf-log-bucket
       OwnershipControls:
         Rules:
         - ObjectOwnership: BucketOwnerPreferred
@@ -31,7 +33,7 @@ Resources:
     Type: AWS::S3::Bucket
     #DeletionPolicy: Retain
     Properties:
-      BucketName: user-site-bucket
+      BucketName: !Sub ${AppName}-user-site-bucket
       BucketEncryption:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
@@ -126,6 +128,7 @@ Resources:
           SslSupportMethod: sni-only
           MinimumProtocolVersion: TLSv1.2_2021
         IPV6Enabled: false
+        HttpVersion: http1.1 | http2
  
   OACUserSite:
     Type: AWS::CloudFront::OriginAccessControl

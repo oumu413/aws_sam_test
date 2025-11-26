@@ -72,6 +72,7 @@ jobs:
             --config-env dev \
             --stack-name userinterface-operations \
             --parameter-overrides \
+              AppName=${{ secrets.APP_NAME }} \
               DomainName=${{ secrets.DOMAIN_NAME_DEV }} \
               HostedZoneId=${{ secrets.HOSTED_ZONE_ID }} \
               CertificateArn=${{ secrets.ACM_CERTIFICATE_ARN }} \
