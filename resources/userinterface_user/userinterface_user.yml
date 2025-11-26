@@ -128,7 +128,7 @@ Resources:
           SslSupportMethod: sni-only
           MinimumProtocolVersion: TLSv1.2_2021
         IPV6Enabled: false
-        HttpVersion: http1.1 | http2
+        HttpVersion: http2
  
   OACUserSite:
     Type: AWS::CloudFront::OriginAccessControl
