@@ -1,5 +1,5 @@
 packages:
   - 'authorizer/*'
-  - 'common/*'
+  - 'commons/*'
   - 'operation/*'
   - 'user/*'
