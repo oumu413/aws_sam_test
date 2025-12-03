@@ -51,7 +51,9 @@ jobs:
         working-directory: backend
       - name: Lambda Authorizer Build(common)
         run: |
+          pnpm --filter @common/auth_manager tsc
           pnpm --filter @common/auth_manager build
+          pnpm --filter @common/logger tsc
           pnpm --filter @common/logger build
       - name: Lambda Authorizer Build(authorizer)
         run: pnpm --filter @authorizer/operation build
