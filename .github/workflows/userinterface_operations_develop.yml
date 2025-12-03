@@ -49,11 +49,13 @@ jobs:
       - name: Install Lambda Authorizer Dependencies
         run: pnpm install --frozen-lockfile
         working-directory: backend
-      - name: Lambda Authorizer Build
+      - name: Lambda Authorizer Build(common)
         run: |
           pnpm --filter @common/auth_manager build
           pnpm --filter @common/logger build
           pnpm --filter @authorizer/operation build
+      - name: Lambda Authorizer Build(authorizer)
+        run: pnpm --filter @authorizer/operation build
         working-directory: backend
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
