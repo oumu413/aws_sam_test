@@ -104,6 +104,7 @@ jobs:
             --config-file userinterface_operations.toml \
             --config-env dev \
             --stack-name userinterface-operations \
+            --resolve-s3 \
             --parameter-overrides \
               AppName=${{ secrets.APP_NAME }} \
               DomainName=${{ secrets.DOMAIN_NAME_DEV }} \
