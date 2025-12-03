@@ -1,0 +1,21 @@
+{
+  "name": "@authorizer/operation",
+  "version": "1.0.0",
+  "description": "Lambda Authorizer Function",
+  "type": "module",
+  "scripts": {
+    "build": "esbuild src/index.ts --bundle --minify --platform=node --format=esm --outfile=dist/index.js",
+    "start:dev": "nodemon --watch src -e ts --exec \"node dist/index.js\"",
+    "tsc": "tsc"
+  },
+  "dependencies": {
+    "@aws-sdk/client-rds-data": "^3.940.0",
+    "@aws-sdk/client-sts": "^3.934.0",
+    "@commons/logger": "workspace:*",
+    "@commons/auth_manager": "workspace:*",
+    "jose": "^6.1.2"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.158"
+  }
+}

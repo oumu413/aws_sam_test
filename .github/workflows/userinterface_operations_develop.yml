@@ -26,11 +26,14 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        run: npm install -g pnpm
   
       - name: Install Dependencies
-        run: npm install
+        run: npm install --frozen-lockfile
         working-directory: frontend/operations
-
       - name: Frontend Build
         run: npm run build
         working-directory: frontend/operations
@@ -40,6 +43,18 @@ jobs:
           name: frontend-operations-build
           path: frontend/operations/dist
 
+      - name: Install Lambda Authorizer Dependencies
+        run: pnpm install --frozen-lockfile
+        working-directory: backend
+      - name: Lambda Authorizer Build
+        run: pnpm --filter @authorizer/operation build
+        working-directory: backend
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-operations-build
+          path: backend/authorizer/operation/dist
+
   ####### Deploy(CD) #######
   deploy:
     needs: build
@@ -48,11 +63,16 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Download Build Artifact
+      - name: Download Build Artifact Frontend
         uses: actions/download-artifact@v4
         with:
           name: frontend-operations-build
           path: dist
+      - name: Download Build Artifact Backend
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-operations-build
+          path: backend/authorizer/operation/dist
         
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
@@ -62,7 +82,7 @@ jobs:
 
       - name: SAM Build
         run: sam build --template-file userinterface_operations.yml
-        working-directory: resources/userinterface_operations
+        working-directory: resources/userinterface
 
       - name: SAM Deploy
         run: |
@@ -78,7 +98,7 @@ jobs:
               CertificateArn=${{ secrets.ACM_CERTIFICATE_ARN }} \
             --no-confirm-changeset \
             --no-fail-on-empty-changeset
-        working-directory: resources/userinterface_operations
+        working-directory: resources/userinterface
 
       #- name: Upload to S3
       #  run: aws s3 sync dist s3://dev-${{ secrets.APP_NAME }}-operations-site-bucket --delete  

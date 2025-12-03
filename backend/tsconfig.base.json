@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",                         // Node.js 構文用
+    "lib": ["ES2022"],                          // Node.js API用
+    "module": "NodeNext",                       // Node.js ESM モジュール
+    "moduleResolution": "NodeNext",             // Node.js ESM モジュール解決
+    
+    // Node.js Type Stripping用
+    //"noEmit": true,
+    //"erasableSyntaxOnly": true,
+    //"allowImportingTsExtensions": true,         // .ts 拡張子のインポートを許可
+
+    "declaration": true,                        // 型定義ファイルを出力
+    "emitDeclarationOnly": true,                // 型定義ファイルのみを出力
+
+    "esModuleInterop": true,                    // CommonJS モジュールと ES モジュールの互換性を有効
+    "forceConsistentCasingInFileNames": true,   // ファイル名の大文字・小文字の不一致をエラー
+    "strict": true,                             // 厳格な型チェックオプションを有効
+    "skipLibCheck": true,                       // ライブラリの型チェックをスキップ 
+  }
+}

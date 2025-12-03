@@ -1,0 +1,264 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: "管理者サイト用 "
+
+Parameters:
+  AppName:
+    Type: String
+  DomainName:
+    Type: String
+  HostedZoneId:
+    Type: String
+  CertificateArn:
+    Type: String
+  Env:
+    Type: String
+
+Resources:
+  #OperationsSiteCloudFrontDistributionLogBucket:
+  #  Type: AWS::S3::Bucket
+  #  Properties:
+  #    BucketName: !Sub ${AppName}-operations-site-cf-log-bucket
+  #    OwnershipControls:
+  #      Rules:
+  #      - ObjectOwnership: BucketOwnerPreferred
+  #    #AccessControl: LogDeliveryWrite
+  #    PublicAccessBlockConfiguration:
+  #      BlockPublicAcls: true
+  #      BlockPublicPolicy: true
+  #      IgnorePublicAcls: true
+  #      RestrictPublicBuckets: true
+  #    LifecycleConfiguration:
+  #      Rules:
+  #        - Id: AutoDelete
+  #          Status: Enabled
+  #          ExpirationInDays: 15
+
+##################################################################################
+## 管理者サイト用 S3バケット
+##################################################################################
+  OperationsSiteBucket:
+    Type: AWS::S3::Bucket
+    #DeletionPolicy: Retain
+    Properties:
+      BucketName: !Sub ${AppName}-operations-site-bucket
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  OperationsSiteBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    DependsOn: OperationsSiteBucket
+    Properties:
+      Bucket: !Ref OperationsSiteBucket
+      PolicyDocument:
+        Statement:
+          - Action: s3:GetObject
+            Effect: Allow
+            Resource: !Sub arn:aws:s3:::${OperationsSiteBucket}/*
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/${OperationsSiteCloudFrontDistribution}
+          #- Action: s3:ListBucket
+          #  Effect: Allow
+          #  Resource: !Sub arn:aws:s3:::${OperationsSiteBucket}
+          #  Principal:
+          #    Service: cloudfront.amazonaws.com
+          #  Condition:
+          #    StringEquals:
+          #      AWS:SourceArn: !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/${OperationsSiteCloudFrontDistribution}
+
+###################################################################################
+## 管理者サイト用 API Gateway ＆ Lambda Authorizer
+###################################################################################
+  OperationsAuthorizerExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: operations-authorizer-execution-role
+      Path: '/'
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: operations-authorizer-execution-policy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - cognito-idp:List*
+                Resource: !Sub
+                  - arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${OperationsUsersUserPool}
+                  - {
+                      OperationsUsersUserPool: !ImportValue Operations-UserPoolId
+                    }
+
+  OperationsAuthorizerFunction:
+    Type: AWS::Serverless::Function
+    DependsOn: OperationsAuthorizerExecutionRole
+    Properties:
+      CodeUri: ../backend/authorizer/dist
+      Handler: index.handler
+      Runtime: nodejs22.x
+      Role: !GetAtt OperationsAuthorizerExecutionRole.Arn
+      MemorySize: 256
+      Timeout: 30
+      Environment:
+        Variables:
+          AWS_REGION: !Ref "AWS::Region"
+          OPERATIONS_USERS_USER_POOL: !ImportValue Operations-UserPoolId
+          OPERATIONS_USERS_APP_CLIENT: !ImportValue Operations-UserPoolClientId
+
+  OperationsRestApi:
+    Type: AWS::Serverless::Api
+    DependsOn: OperationsAuthorizerFunction
+    Properties:
+      Name: !Sub ${Env}-operations-api
+      StageName: !Ref Env
+      EndpointConfiguration: REGIONAL
+      Cors:
+        AllowMethods: "'GET,DELETE,OPTIONS'"
+        AllowHeaders: "'Content-Type,Authorization'"
+        AllowOrigin: "'*'"
+      Auth:
+        DefaultAuthorizer: OperationsApiAuthorizer
+        Authorizers:
+          OperationsApiAuthorizer:
+            FunctionArn: !GetAtt OperationsAuthorizerFunction.Arn
+            Identity:
+              Header: Authorization
+              ReauthorizeEvery: 30
+
+
+###################################################################################
+## 管理者サイト用 CloudFront ディストリビューション
+###################################################################################
+  OACOperationsSite:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Description: operations-site-oac
+        Name: operations-site-oac
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+
+  OperationsSiteCloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    DependsOn:
+      - OperationsSiteBucket
+      - OperationsRestApi
+      - OACOperationsSite
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        Comment: !Sub operations-site-distribution
+        Aliases:
+          - !Sub round-operations.${DomainName}
+        PriceClass: PriceClass_200
+        Origins:
+          - Id: OperationsSiteOrigin
+            DomainName: !Sub ${OperationsSiteBucket}.s3.amazonaws.com
+            OriginAccessControlId: !GetAtt OACOperationsSite.Id
+            S3OriginConfig: {}
+          - Id: ApiGatewayOrigin
+            DomainName: !Sub ${OperationsRestApi}.execute-api.${AWS::Region}.amazonaws.com
+            OriginPath: !Sub /${Env}
+            CustomOriginConfig:
+              OriginProtocolPolicy: https-only
+              OriginSSLProtocols:
+                - TLSv1.2
+        #Logging:
+        #  IncludeCookies: false
+        #  Bucket: !Sub ${OperationsSiteCloudFrontDistributionLogBucket}.s3.${AWS::Region}.amazonaws.com
+        DefaultRootObject: index.html
+        DefaultCacheBehavior:
+          TargetOriginId: OperationsSiteOrigin
+          ViewerProtocolPolicy: redirect-to-https
+          AllowedMethods:
+            - HEAD
+            - GET
+          CachedMethods:
+            - HEAD
+            - GET
+          CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad # CachingDisabled
+        CacheBehaviors:
+          - PathPattern: "/assets/*"
+            TargetOriginId: OperationsSiteOrigin
+            ViewerProtocolPolicy: redirect-to-https
+            AllowedMethods:
+              - GET
+              - HEAD
+            CachedMethods:
+              - GET
+              - HEAD
+            Compress: true
+            CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad # CachingDisabled  
+          - PathPattern: !Sub "/api/*"
+            TargetOriginId: ApiGatewayOrigin
+            ViewerProtocolPolicy: redirect-to-https
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+              - PUT
+              - POST
+              - PATCH
+              - DELETE
+            CachedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+            Compress: true
+            CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad # CachingDisabled
+            OriginRequestPolicyId: b689b0a8-53d0-40ab-baf2-68738e2966ac # AllViewerExceptHostHeader　カスタムポリシーにするか検討
+        CustomErrorResponses:
+          - ErrorCachingMinTTL: 0
+            ErrorCode: 403
+            ResponseCode: 403
+            ResponsePagePath: /index.html
+          - ErrorCachingMinTTL: 0
+            ErrorCode: 404
+            ResponseCode: 404
+            ResponsePagePath: /index.html
+        ViewerCertificate:
+          AcmCertificateArn: !Ref CertificateArn
+          SslSupportMethod: sni-only
+          MinimumProtocolVersion: TLSv1.2_2021
+        IPV6Enabled: false
+        HttpVersion: http2
+
+################################################################################
+## 管理者サイト用 Route53 レコードセット
+################################################################################
+  Route53OperationsSiteRecordSet:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref HostedZoneId
+      Name: !Sub round-operations.${DomainName}
+      Type: A
+      AliasTarget:
+        HostedZoneId: Z2FDTNDATAQYW2 #　CloudFront Hosted Zone ID (固定値)
+        DNSName: !GetAtt OperationsSiteCloudFrontDistribution.DomainName
+
+Outputs:
+  OperationsSiteCloudFrontDistributionDomain:
+    Value: !GetAtt OperationsSiteCloudFrontDistribution.DomainName
+    Description: CloudFront Domain Name
+    Export:
+      Name: Operations-Site-CloudFrontDomainName

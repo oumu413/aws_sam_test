@@ -1,0 +1,13 @@
+{
+  "name": "@commons/auth_manager",
+  "version": "1.0.0",
+  "description": "Common utilities logger for Lambda functions",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "esbuild src/index.ts --bundle --minify --platform=node --format=esm --outfile=dist/index.js",
+    "start:dev": "nodemon --watch src -e ts --exec \"node dist/index.js\"",
+    "tsc": "tsc"
+  },
+  "types": "dist/index.d.ts"
+}

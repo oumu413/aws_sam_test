@@ -1,0 +1,19 @@
+{
+  "name": "@commons/logger",
+  "version": "1.0.0",
+  "description": "Common utilities logger for Lambda functions",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "esbuild src/index.ts --bundle --minify --platform=node --format=esm --outfile=dist/index.js",
+    "start:dev": "nodemon --watch src -e ts --exec \"node dist/index.js\"",
+    "tsc": "tsc"
+  },
+  "dependencies": {
+    "@aws-lambda-powertools/logger": "^2.28.1"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.158"
+  },
+  "types": "dist/index.d.ts"
+}

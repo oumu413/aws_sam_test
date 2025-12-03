@@ -1,0 +1,25 @@
+{
+  "name": "sample-lambda-app-root",
+  "version": "1.0.0",
+  "description": "Serverless Express Monorepo with SAM and pnpm",
+  "main": "index.js",
+  "private": true,
+  "workspaces": [
+    "authorizer/*",
+    "commons/*",
+    "operation/*",
+    "user/*"
+  ],
+  "scripts": {
+    "build": "pnpm -r build",
+    "sam:build": "sam build",
+    "sam:local": "sam local start-api",
+    "sam:deploy": "sam deploy"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "esbuild": "^0.25.12",
+    "nodemon": "^3.1.11",
+    "typescript": "^5.9.3"
+  }
+}

@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: cognito operation users user pool
+Description: "Cognitoの作成（オペレーションユーザー用）"
 
 Parameters:
   DomainName:
@@ -81,25 +81,24 @@ Resources:
         - profile
       WriteAttributes:
         - "email"
-        - "custom:tenantId"
         - "custom:userRole"
 
-  CognitoOperationUserGroup:
-    Type: AWS::Cognito::UserPoolGroup
-    Properties:
-      GroupName: SystemAdmins
-      Description: Admin user group
-      Precedence: 0
-      UserPoolId: !Ref CognitoOperationUsersUserPool
-        
+#  CognitoOperationUserGroup:
+#    Type: AWS::Cognito::UserPoolGroup
+#    Properties:
+#      GroupName: SystemAdmins
+#      Description: Admin user group
+#      Precedence: 0
+#      UserPoolId: !Ref CognitoOperationUsersUserPool
+
 Outputs:
   CognitoOperationUsersUserPoolId:
-    Description: "Cognito Operation Users User Pool ID"
+    Description: "オペレーション用ユーザープールのID"
     Value: !Ref CognitoOperationUsersUserPool
     Export:
-      Name: !Sub Operations-UserPoolId
+      Name: Operations-UserPoolId
   CognitoOperationUsersUserPoolClientId:
-    Description: "Cognito Operation Users User Pool Client ID"
+    Description: "オペレーション用ユーザープールクライアントのID"
     Value: !Ref CognitoOperationUsersUserPoolClient
     Export:
-      Name: !Sub Operations-UserPoolClientId
+      Name: Operations-UserPoolClientId
