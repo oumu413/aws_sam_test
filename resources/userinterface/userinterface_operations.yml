@@ -112,7 +112,7 @@ Resources:
     Type: AWS::Serverless::Function
     DependsOn: OperationsAuthorizerExecutionRole
     Properties:
-      CodeUri: ../backend/authorizer/operation/dist
+      CodeUri: ../../backend/authorizer/operation/dist
       Handler: index.handler
       Runtime: nodejs22.x
       Role: !GetAtt OperationsAuthorizerExecutionRole.Arn
