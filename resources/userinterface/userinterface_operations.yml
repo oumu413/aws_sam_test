@@ -144,6 +144,7 @@ Resources:
         Authorizers:
           OperationsApiAuthorizer:
             FunctionArn: !GetAtt OperationsAuthorizerFunction.Arn
+            AuthorizerPayloadFormatVersion: 2.0
             Identity:
               Header: Authorization
               ReauthorizeEvery: 30
