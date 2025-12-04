@@ -165,7 +165,6 @@ Resources:
 
   OperationsSiteCloudFrontDistribution:
     Type: AWS::CloudFront::Distribution
-    DeletionPolicy: Retain
     DependsOn:
       - OperationsSiteBucket
       - OperationsHttpApi
