@@ -122,7 +122,7 @@ Resources:
       Timeout: 30
       Environment:
         Variables:
-          AWS_REGION: !Ref "AWS::Region"
+          OPERATIONS_USERS_USER_POOL_REGION: !Ref "AWS::Region"
           OPERATIONS_USERS_USER_POOL: !ImportValue Operations-UserPoolId
           OPERATIONS_USERS_APP_CLIENT: !ImportValue Operations-UserPoolClientId
 

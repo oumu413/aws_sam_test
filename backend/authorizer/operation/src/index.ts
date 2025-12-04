@@ -23,7 +23,7 @@ interface AuthResponse {
   usageIdentifierKey?: string
 }
 
-const region = process.env.AWS_REGION
+const region = process.env.OPERATIONS_USERS_USER_POOL_REGION!
 
 const operationsUsersUserPoolId = process.env.OPERATIONS_USERS_USER_POOL!
 const operationsUsersAppClientId = process.env.OPERATIONS_USERS_APP_CLIENT!
