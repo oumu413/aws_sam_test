@@ -1,92 +1,77 @@
+import { APIGatewayRequestAuthorizerEventV2, APIGatewaySimpleAuthorizerWithContextResult } from 'aws-lambda'
 import { jwtVerify, createRemoteJWKSet, JWTPayload } from "jose"
 import  logger  from "@commons/logger"
 import authManager, { UserRoles } from "@commons/auth_manager"
-import { AuthPolicy, HttpVerb } from "./authPolicy.js"
 
-interface APIGatewayAuthorizerEvent {
-  authorizationToken: string
-  methodArn: string
+type AuthContext = {
+  userName?: string
+  userRole?: string
+  reason?: string
 }
 
-interface AuthResponse {
-  principalId: string
-  policyDocument: {
-    Version: string
-    Statement: Array<{
-      Action: string
-      Effect: string
-      Resource: string[]
-      Condition?: Record<string, any>
-    }>
-  }
-  context?: Record<string, any>
-  usageIdentifierKey?: string
+
+// 環境変数からCognito設定を取得
+const region = process.env.OPERATIONS_USERS_USER_POOL_REGION
+const operationsUsersUserPoolId = process.env.OPERATIONS_USERS_USER_POOL
+const operationsUsersAppClientId = process.env.OPERATIONS_USERS_APP_CLIENT
+
+// 実行時チェック
+if (!region || !operationsUsersUserPoolId || !operationsUsersAppClientId) {
+  throw new Error('Missing required environment variables for Cognito configuration.')
 }
 
-const region = process.env.OPERATIONS_USERS_USER_POOL_REGION!
+export const handler = async (
+  event: APIGatewayRequestAuthorizerEventV2
+): Promise<APIGatewaySimpleAuthorizerWithContextResult<AuthContext>> => {
+  const routeKey = event.routeKey // 例: "POST /tenant"
+  logger.info(`Route Key: ${routeKey}`)
 
-const operationsUsersUserPoolId = process.env.OPERATIONS_USERS_USER_POOL!
-const operationsUsersAppClientId = process.env.OPERATIONS_USERS_APP_CLIENT!
-
-
-export const handler = async (event: APIGatewayAuthorizerEvent): Promise<AuthResponse> => {
-  const tokenParts = event.authorizationToken.split(" ")
-  if (tokenParts[0] !== "Bearer") {
-    throw new Error("Authorization header should have format Bearer <JWT>")
-  }
-  const jwtBearerToken = tokenParts[1]
-
-  logger.info("Method ARN:" + event.methodArn)
-
-  const unverifiedClaims = JSON.parse(Buffer.from(jwtBearerToken.split(".")[1], "base64").toString())
-  logger.info(unverifiedClaims)
-
-  if (!authManager.isSaaSProvider(unverifiedClaims["custom:userRole"])) {
-    logger.error("JWT userRole is invalid")
-    throw new Error("JWT userRole is invalid")
+  const authHeader = event.headers?.authorization || event.headers?.Authorization
+  const authResponse:APIGatewaySimpleAuthorizerWithContextResult<AuthContext> = {
+    isAuthorized: false,  
+    context: {}
   }
 
-  const claims = await validateJWT(jwtBearerToken, operationsUsersAppClientId, operationsUsersUserPoolId)
+  // トークン形式チェック
+  if (!authHeader?.startsWith("Bearer ")) {
+    authResponse.context = { reason: "missing/invalid token" }
+    logger.error("missing/invalid token")
+    return authResponse
+  }
+
+  const token = authHeader.slice("Bearer ".length)
+
+  // JWT検証
+  const claims = await validateJWT(token, operationsUsersAppClientId, operationsUsersUserPoolId)
   if (!claims) {
-    logger.error("Unauthorized")
-    throw new Error("Unauthorized")
+    authResponse.context = { reason: "Unauthorized" }
+    logger.error('JWT validation failed')
+    return authResponse
   }
-  logger.info(claims.toString())
-  const principalId = claims.sub!
-  const userName = claims["cognito:userName"] as string
+
+  logger.info(`JWT verified successfully: ${JSON.stringify(claims)}`)
+
+  const userName = claims["cognito:username"] as string
   const userRole = claims["custom:userRole"] as UserRoles
 
-  const tmp = event.methodArn.split(":")
-  const apiGatewayArnTmp = tmp[5].split("/")
-  const awsAccountId = tmp[4]
+  const rawPath = event.rawPath // 例: "/tenants/12345"
+  const method = event.requestContext.http.method // 例: "GET"
 
-  const policy = new AuthPolicy(principalId, awsAccountId)
-  policy.restApiId = apiGatewayArnTmp[0]
-  policy.region = tmp[3]
-  policy.stage = apiGatewayArnTmp[1]
-
-  if (authManager.isSaaSProvider(userRole)) {
-    policy.allowAllMethods()
-    if (authManager.isTenantAdmin(userRole)) {
-      policy.denyMethod(HttpVerb.POST, "tenant-activation")
-      policy.denyMethod(HttpVerb.GET, "tenants")
-    }
+  // methodとrowPath,userRoleからアクセス権限を判定
+  if (authManager.isAuthorizedRoute(method, rawPath, userRole)) {
+    authResponse.isAuthorized = true
+    authResponse.context = { userName, userRole }
+    logger.info(`Authorization granted for ${method} ${rawPath}, role=${userRole}`)
   } else {
-    logger.error("Userpool userRole is invalid")
-    throw new Error("Userpool userRole is invalid")
+    authResponse.context = { reason: 'User is not authorized to access this resource' }
+    logger.error(`Authorization denied for ${method} ${rawPath}, role=${userRole}`)
   }
 
-  const authResponse:AuthResponse = policy.build()
-  authResponse.context = {
-    userName,
-    operationsUsersUserPoolId,
-    userRole
-  }
-
+  logger.info(`Authorization result: ${authResponse.isAuthorized}, reason: ${authResponse.context.reason || 'OK'}`)
   return authResponse
 }
 
-
+// JWTを検証する関数
 async function validateJWT(token: string, appClientId?: string, userPoolId?: string): Promise<JWTPayload | false> {
   const jwksUrl = `https://cognito-idp.${region}.amazonaws.com/${userPoolId}/.well-known/jwks.json`
   const JWKS = createRemoteJWKSet(new URL(jwksUrl))

@@ -5,12 +5,20 @@ const logger = new Logger({
   logLevel: 'INFO',
 })
 
+function debug(logMessage: string): void {
+  logger.debug(logMessage)
+}
+
 function info(logMessage: string): void {
   logger.info(logMessage)
 }
 
 function error(logMessage: string): void {
   logger.error(logMessage)
+}
+
+function warn(logMessage: string): void {
+  logger.warn(logMessage)
 }
 
 function logWithTenantContext(event: APIGatewayProxyEvent, logMessage: string): void {
@@ -20,7 +28,9 @@ function logWithTenantContext(event: APIGatewayProxyEvent, logMessage: string): 
 }
 
 export default {
+  debug,
   info,
   error,
+  warn,
   logWithTenantContext,
 }

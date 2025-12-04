@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: S3 + CloudFront + Route53 A Record(user site)
+Description: "User Interface Resources for User Site"
 
 Parameters:
   AppName:

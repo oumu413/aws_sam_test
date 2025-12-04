@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: "Cognitoの作成（オペレーションユーザー用）"
+Description: "Cognito User Pool for Operation Users"
 
 Parameters:
   DomainName:

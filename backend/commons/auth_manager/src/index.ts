@@ -1,3 +1,16 @@
+
+// ユーザーロールごとの許可された操作を定義
+const rolePermissions: Record<UserRoles, string[]> = {
+  OperationAdmin: ['*'], // 全権限
+  OperationSubAdmin: ['POST /tenant-activation'],
+  OperationViewer: ['GET /tenants/*'], // 動的パス対応
+  TenantAdmin: [],
+  TenantSubAdmin: [],
+  TenantViewer: [],
+  TenantUser: []
+}
+
+
 export enum UserRoles {
   OPERATION_ADMIN = "OperationAdmin",
   OPERATION_SUB_ADMIN = "OperationSubAdmin",
@@ -40,6 +53,21 @@ function isTenantUser(userRole: UserRoles): boolean {
   return userRole === UserRoles.TENANT_USER
 }
 
+
+// マッチング関数
+function isAuthorizedRoute(method: string, rawPath: string, userRole: UserRoles): boolean {
+  const routeKey = `${method.toUpperCase()} ${rawPath}`
+  const allowedRoutes = rolePermissions[userRole] || []
+  return allowedRoutes.some(route => {
+    if (route === '*') return true
+    if (route.endsWith('*')) {
+      const prefix = route.replace('*', '')
+      return routeKey.startsWith(prefix)
+    }
+    return routeKey === route
+  })
+}
+
 export default {
   isOperationAdmin,
   isOperationSubAdmin,
@@ -49,4 +77,5 @@ export default {
   isTenantSubAdmin,
   isTenantViewer,
   isTenantUser,
+  isAuthorizedRoute,
 }

@@ -10,9 +10,9 @@
   },
   "dependencies": {
     "@aws-sdk/client-rds-data": "^3.940.0",
-    "@aws-sdk/client-sts": "^3.934.0",
-    "@commons/logger": "workspace:*",
     "@commons/auth_manager": "workspace:*",
+    "@commons/logger": "workspace:*",
+    "aws-lambda": "^1.0.7",
     "jose": "^6.1.2"
   },
   "devDependencies": {
