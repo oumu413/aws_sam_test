@@ -112,6 +112,7 @@ jobs:
               HostedZoneId=${{ secrets.HOSTED_ZONE_ID }} \
               CertificateArn=${{ secrets.ACM_CERTIFICATE_ARN }} \
             --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM \
+            --no-confirm-changeset \
             --no-fail-on-empty-changeset
         working-directory: resources/userinterface
 
