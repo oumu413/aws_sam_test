@@ -266,3 +266,8 @@ Outputs:
     Description: CloudFront Domain Name
     Export:
       Name: Operations-Site-CloudFrontDomainName
+  OperationsHttpApiId:
+    Value: !Ref OperationsHttpApi
+    Description: Operations HTTP API ID
+    Export:
+      Name: Operations-HttpApiId
