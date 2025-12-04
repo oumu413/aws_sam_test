@@ -183,7 +183,6 @@ Resources:
             S3OriginConfig: {}
           - Id: ApiGatewayOrigin
             DomainName: !Sub ${OperationsHttpApi}.execute-api.${AWS::Region}.amazonaws.com
-            OriginPath: !Sub /
             CustomOriginConfig:
               OriginProtocolPolicy: https-only
               OriginSSLProtocols:
