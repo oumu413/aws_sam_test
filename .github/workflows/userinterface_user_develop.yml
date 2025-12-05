@@ -68,8 +68,6 @@ jobs:
         run: |
           sam deploy \
             --template-file userinterface_user.yml \
-            --config-file userinterface_user.toml \
-            --config-env dev \
             --stack-name userinterface-user \
             --parameter-overrides \
               AppName=${{ secrets.APP_NAME }} \

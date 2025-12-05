@@ -1,19 +1,19 @@
 {
-  "name": "@commons/logger",
+  "name": "@operations/users_service",
   "version": "1.0.0",
-  "description": "Common utilities logger for Lambda functions",
+  "description": "Lambda Function operations_users_service",
   "type": "module",
-  "main": "dist/index.js",
   "scripts": {
     "build": "esbuild src/index.ts --bundle --minify --sourcemap --platform=node --format=esm --outfile=dist/index.js",
     "start:dev": "nodemon --watch src -e ts --exec \"node dist/index.js\"",
     "tsc": "tsc"
   },
   "dependencies": {
-    "@aws-lambda-powertools/logger": "^2.28.1"
+    "@codegenie/serverless-express": "^4.17.0",
+    "express": "^5.1.0"
   },
   "devDependencies": {
-    "@types/aws-lambda": "^8.10.158"
-  },
-  "types": "dist/index.d.ts"
+    "@types/aws-lambda": "^8.10.158",
+    "@types/express": "^4.17.25"
+  }
 }

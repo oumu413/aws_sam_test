@@ -1,15 +1,15 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: "Cognito User Pool for Operation Users"
+Description: "Cognito User Pool for Operations"
 
 Parameters:
   DomainName:
     Type: String
 
 Resources:
-  CognitoOperationUsersUserPool:
+  CognitoOperationsUserPool:
     Type: "AWS::Cognito::UserPool"
     Properties:
-      UserPoolName: !Sub operation-users-user-pool
+      UserPoolName: !Sub operations-user-pool
       AutoVerifiedAttributes:
         - "email"
       AccountRecoverySetting:
@@ -55,11 +55,11 @@ Resources:
           RequireNumbers: true
           RequireSymbols: true
         
-  CognitoOperationUsersUserPoolClient:
+  CognitoOperationsUserPoolClient:
     Type: "AWS::Cognito::UserPoolClient"
     Properties:
-      ClientName: !Sub operation-users-pool-client
-      UserPoolId: !Ref CognitoOperationUsersUserPool
+      ClientName: !Sub operations-pool-client
+      UserPoolId: !Ref CognitoOperationsUserPool
       GenerateSecret: false
       ExplicitAuthFlows:
         - "ALLOW_USER_PASSWORD_AUTH"
@@ -83,22 +83,22 @@ Resources:
         - "email"
         - "custom:userRole"
 
-#  CognitoOperationUserGroup:
+#  CognitoOperationsGroup:
 #    Type: AWS::Cognito::UserPoolGroup
 #    Properties:
 #      GroupName: SystemAdmins
 #      Description: Admin user group
 #      Precedence: 0
-#      UserPoolId: !Ref CognitoOperationUsersUserPool
+#      UserPoolId: !Ref CognitoOperationsUserPool
 
 Outputs:
-  CognitoOperationUsersUserPoolId:
+  CognitoOperationsUserPoolId:
     Description: "オペレーション用ユーザープールのID"
-    Value: !Ref CognitoOperationUsersUserPool
+    Value: !Ref CognitoOperationsUserPool
     Export:
       Name: Operations-UserPoolId
-  CognitoOperationUsersUserPoolClientId:
+  CognitoOperationsUserPoolClientId:
     Description: "オペレーション用ユーザープールクライアントのID"
-    Value: !Ref CognitoOperationUsersUserPoolClient
+    Value: !Ref CognitoOperationsUserPoolClient
     Export:
       Name: Operations-UserPoolClientId

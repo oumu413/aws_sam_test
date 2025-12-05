@@ -68,14 +68,6 @@ Resources:
             Condition:
               StringEquals:
                 AWS:SourceArn: !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/${OperationsSiteCloudFrontDistribution}
-          #- Action: s3:ListBucket
-          #  Effect: Allow
-          #  Resource: !Sub arn:aws:s3:::${OperationsSiteBucket}
-          #  Principal:
-          #    Service: cloudfront.amazonaws.com
-          #  Condition:
-          #    StringEquals:
-          #      AWS:SourceArn: !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/${OperationsSiteCloudFrontDistribution}
 
 ###################################################################################
 ## 管理者サイト用 API Gateway(HTTP API) ＆ Lambda Authorizer
@@ -112,7 +104,8 @@ Resources:
     Type: AWS::Serverless::Function
     DependsOn: OperationsAuthorizerExecutionRole
     Properties:
-      CodeUri: ../../backend/authorizer/operation/dist
+      FunctionName: operations-authorizer-function
+      CodeUri: ../../backend/authorizer/operations/dist
       Handler: index.handler
       Runtime: nodejs22.x
       Role: !GetAtt OperationsAuthorizerExecutionRole.Arn
@@ -120,6 +113,7 @@ Resources:
       Timeout: 30
       Environment:
         Variables:
+          NODE_OPTIONS: "--enable-source-maps"
           OPERATIONS_USERS_USER_POOL_REGION: !Ref "AWS::Region"
           OPERATIONS_USERS_USER_POOL: !ImportValue Operations-UserPoolId
           OPERATIONS_USERS_APP_CLIENT: !ImportValue Operations-UserPoolClientId
