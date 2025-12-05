@@ -14,6 +14,11 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { signOut } from "aws-amplify/auth"
+defineOptions({
+  meta: {
+    layout: 'Auth'
+  }
+})
 
 const router = useRouter()
 const goHome = () => {

@@ -12,9 +12,13 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AppFooter: typeof import('./components/globals/AppFooter.vue')['default']
-    ChangePasswordForm: typeof import('./components/new-password/ChangePasswordForm.vue')['default']
+    BaseButton: typeof import('./components/base/BaseButton.vue')['default']
+    ChangePasswordForm: typeof import('./components/new_password/ChangePasswordForm.vue')['default']
     LoginForm: typeof import('./components/login/LoginForm.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SubmitButton: typeof import('./components/globals/button/SubmitButton.vue')['default']
+    Test: typeof import('./components/tenants/Test.vue')['default']
+    TestButton: typeof import('./components/globals/button/TestButton.vue')['default']
   }
 }

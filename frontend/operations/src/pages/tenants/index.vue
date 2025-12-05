@@ -1,17 +1,13 @@
 <template>
   tenants
-  <div>
-    {{ test }}
-  </div>
+  <Test/>
 </template>
 
 <script lang="ts" setup>
 defineOptions({
   meta: {
-    layout: 'auth'
+    layout: 'Default'
   }
 })
 
-
-const test = ref(Math.random())
 </script>

@@ -8,7 +8,7 @@
 <script lang="ts" setup>
 defineOptions({
   meta: {
-    layout: 'auth'
+    layout: 'Default'
   }
 })
 
