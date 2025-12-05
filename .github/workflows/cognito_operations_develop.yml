@@ -2,9 +2,6 @@
 name: Cognito for Operations Site (develop)
 
 on:
-  push:
-    branches:
-      - develop   # 開発環境
   workflow_dispatch:
     
 permissions:

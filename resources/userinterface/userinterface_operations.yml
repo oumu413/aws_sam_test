@@ -101,7 +101,9 @@ Resources:
             OriginAccessControlId: !GetAtt OACOperationsSite.Id
             S3OriginConfig: {}
           - Id: ApiGatewayOrigin
-            DomainName: !Sub "${ImportValue Operations-HttpApiId}.execute-api.${AWS::Region}.amazonaws.com"
+            DomainName: !Sub 
+              - "${OperationsHttpApiId}.execute-api.${AWS::Region}.amazonaws.com"
+              - { OperationsHttpApiId: !ImportValue Operations-HttpApiId }
             CustomOriginConfig:
               OriginProtocolPolicy: https-only
               OriginSSLProtocols:
