@@ -12,6 +12,83 @@ Globals:
         NODE_OPTIONS: "--enable-source-maps"
 
 Resources:
+###################################################################################
+## 管理者サイト用 API Gateway(HTTP API) ＆ Lambda Authorizer
+###################################################################################
+  OperationsAuthorizerExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: operations-authorizer-execution-role
+      Path: '/'
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: operations-authorizer-execution-policy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - cognito-idp:List*
+                Resource: !Sub
+                  - arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${OperationsUsersUserPool}
+                  - { OperationsUsersUserPool: !ImportValue Operations-UserPoolId }
+
+  OperationsAuthorizerFunction:
+    Type: AWS::Serverless::Function
+    DependsOn: OperationsAuthorizerExecutionRole
+    Properties:
+      FunctionName: operations-authorizer-function
+      CodeUri: ../../backend/authorizer/operations/dist
+      Handler: index.handler
+      Runtime: nodejs22.x
+      Role: !GetAtt OperationsAuthorizerExecutionRole.Arn
+      MemorySize: 256
+      Timeout: 30
+      Environment:
+        Variables:
+          NODE_OPTIONS: "--enable-source-maps"
+          OPERATIONS_USERS_USER_POOL_REGION: !Ref "AWS::Region"
+          OPERATIONS_USERS_USER_POOL: !ImportValue Operations-UserPoolId
+          OPERATIONS_USERS_APP_CLIENT: !ImportValue Operations-UserPoolClientId
+
+  OperationsHttpApi:
+    Type: AWS::Serverless::HttpApi
+    DependsOn: OperationsAuthorizerFunction
+    Properties:
+      Name: operations-http-api
+      CorsConfiguration:
+        AllowMethods:
+          - GET
+          - DELETE
+          - OPTIONS
+        AllowHeaders:
+          - Content-Type
+          - Authorization
+        AllowOrigins:
+          - "*"
+      Auth:
+        DefaultAuthorizer: OperationsApiAuthorizer
+        Authorizers:
+          OperationsApiAuthorizer:
+            FunctionArn: !GetAtt OperationsAuthorizerFunction.Arn
+            AuthorizerPayloadFormatVersion: 2.0
+            Identity:
+              Header: Authorization
+              ReauthorizeEvery: 30
+
+###################################################################################
+## 管理者サイト用 Users Service Lambda Function
+###################################################################################
   OperationsExecutionRole:
     Type: AWS::IAM::Role
     Properties:
@@ -37,8 +114,8 @@ Resources:
                 Action:
                   - cognito-idp:List*
                 Resource: !Sub
-                  - arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${OperationsUsersUserPool}
-                  - { OperationsUsersUserPool: !ImportValue Operations-UserPoolId }
+                  - arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${OperationsUserPool}
+                  - { OperationsUserPool: !ImportValue Operations-UserPoolId }
 
   OperationsUsersFunction:
     Type: AWS::Serverless::Function
@@ -51,6 +128,14 @@ Resources:
         ProxyApi:
           Type: HttpApi
           Properties:
-            ApiId: !ImportValue Operations-HttpApiId
+            #ApiId: !ImportValue Operations-HttpApiId
+            ApiId: !Ref DummyHttpApi
             Path: /users/{proxy+} 
             Method: ANY
+
+Outputs:
+  OperationsHttpApiId:
+    Value: !Ref OperationsHttpApi
+    Description: Operations HTTP API ID
+    Export:
+      Name: Operations-HttpApiId

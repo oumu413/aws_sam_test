@@ -25,17 +25,10 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 10.22.0
-
       - name: Use Node.js 22.x
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'pnpm'
-          cache-dependency-path: backend/pnpm-lock.yaml
 
       ### Frontend Build ###
       - name: Install Dependencies
@@ -46,31 +39,12 @@ jobs:
         run: npm run build
         working-directory: frontend/operations
 
-      ### Lambda Authorizer Build ###
-      - name: Install Lambda Authorizer Dependencies
-        run: pnpm install --frozen-lockfile
-        working-directory: backend
-
-      - name: Lambda Authorizer Build(common)
-        run: |
-          pnpm --filter @commons/auth_manager tsc
-          pnpm --filter @commons/auth_manager build
-          pnpm --filter @commons/logger tsc
-          pnpm --filter @commons/logger build
-        working-directory: backend
-
-      - name: Lambda Authorizer Build(authorizer)
-        run: pnpm --filter @authorizer/operations build
-        working-directory: backend
-
-
       ### AWS Credentials ###
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN_DEV }}
           aws-region: ${{ secrets.AWS_REGION_DEV }}
-
 
       ### SAM Deploy ###
       - name: SAM Build

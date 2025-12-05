@@ -93,12 +93,12 @@ Resources:
 
 Outputs:
   CognitoOperationsUserPoolId:
-    Description: "オペレーション用ユーザープールのID"
+    Description: "Operations User Pool ID"
     Value: !Ref CognitoOperationsUserPool
     Export:
       Name: Operations-UserPoolId
   CognitoOperationsUserPoolClientId:
-    Description: "オペレーション用ユーザープールクライアントのID"
+    Description: "Operations User Pool Client ID"
     Value: !Ref CognitoOperationsUserPoolClient
     Export:
       Name: Operations-UserPoolClientId

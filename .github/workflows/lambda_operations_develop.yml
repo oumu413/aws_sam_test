@@ -37,7 +37,7 @@ jobs:
           cache-dependency-path: backend/pnpm-lock.yaml
 
 
-      ### Lambda Operations Build ###
+      ### Lambda Aurhorizer & Operations Build ###
       - name: Install Lambda Operations Dependencies
         run: pnpm install --frozen-lockfile
         working-directory: backend
@@ -48,6 +48,10 @@ jobs:
           pnpm --filter @commons/auth_manager build
           pnpm --filter @commons/logger tsc
           pnpm --filter @commons/logger build
+        working-directory: backend
+
+      - name: Lambda Authorizer Build(authorizer)
+        run: pnpm --filter @authorizer/operations build
         working-directory: backend
 
       - name: Lambda Operations Build(operations)
