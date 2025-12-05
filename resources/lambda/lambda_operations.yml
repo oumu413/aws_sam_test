@@ -44,7 +44,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: operations-users-function
-      CodeUri: ../../backend/operations/operations_users_service/dist
+      CodeUri: ../../backend/operations/users_service/dist
       Handler: index.handler
       Role: !GetAtt OperationsExecutionRole.Arn
       Events:
