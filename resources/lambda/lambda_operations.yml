@@ -128,8 +128,7 @@ Resources:
         ProxyApi:
           Type: HttpApi
           Properties:
-            #ApiId: !ImportValue Operations-HttpApiId
-            ApiId: !Ref DummyHttpApi
+            ApiId: !Ref OperationsHttpApi
             Path: /users/{proxy+} 
             Method: ANY
 
