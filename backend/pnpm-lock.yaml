@@ -42,6 +42,9 @@ importers:
       '@types/aws-lambda':
         specifier: ^8.10.158
         version: 8.10.159
+      esbuild:
+        specifier: ^0.25.12
+        version: 0.25.12
 
   authorizer/user:
     dependencies:
