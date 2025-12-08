@@ -48,7 +48,7 @@ Resources:
     DependsOn: OperationsAuthorizerExecutionRole
     Properties:
       FunctionName: operations-authorizer-function
-      CodeUri: ../../backend/authorizer/operations/dist
+      CodeUri: backend/authorizer/operations/dist
       Handler: index.handler
       Role: !GetAtt OperationsAuthorizerExecutionRole.Arn
       MemorySize: 256
@@ -120,7 +120,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: operations-users-function
-      CodeUri: ../../backend/operations/users_service
+      CodeUri: backend/operations/users_service
       Handler: index.handler
       Role: !GetAtt OperationsExecutionRole.Arn
       Events:
@@ -142,7 +142,7 @@ Resources:
         Target: "es2022"
         Sourcemap: true
         EntryPoints: 
-          - src/index.ts
+          - src\index.ts
 Outputs:
   OperationsHttpApiId:
     Value: !Ref OperationsHttpApi
