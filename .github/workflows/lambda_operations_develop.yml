@@ -79,7 +79,7 @@ jobs:
         run: |
           sam deploy \
             --template-file resources/lambda/lambda_operations.yml \
-            --base-dir $GITHUB_WORKSPAC \
+            --base-dir . \
             --stack-name lambda-operations \
             --resolve-s3 \
             --parameter-overrides \
