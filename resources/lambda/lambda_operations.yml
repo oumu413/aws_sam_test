@@ -142,7 +142,7 @@ Resources:
         Target: "es2022"
         Sourcemap: true
         EntryPoints: 
-          - index.ts
+          - src/index.ts
 Outputs:
   OperationsHttpApiId:
     Value: !Ref OperationsHttpApi
