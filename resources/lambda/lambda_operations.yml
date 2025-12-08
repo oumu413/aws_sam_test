@@ -80,11 +80,12 @@ Resources:
         DefaultAuthorizer: OperationsApiAuthorizer
         Authorizers:
           OperationsApiAuthorizer:
-            FunctionArn: !GetAtt OperationsAuthorizerFunction.Arn
             AuthorizerPayloadFormatVersion: 2.0
+            FunctionArn: !GetAtt OperationsAuthorizerFunction.Arn
+            EnableSimpleResponses: true
             Identity:
               Header: Authorization
-              ReauthorizeEvery: 30
+              ReauthorizeEvery: 0
 
 ###################################################################################
 ## 管理者サイト用 Users Service Lambda Function
