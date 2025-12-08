@@ -11,8 +11,8 @@
   "dependencies": {
     "@codegenie/serverless-express": "^4.17.0",
     "express": "^5.1.0",
-    "@commons/auth_manager": "workspace:*",
-    "@commons/logger": "workspace:*"
+    "@commons/auth_manager": "file:../../commons/auth_manager",
+    "@commons/logger": "file:../../commons/logger"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.158",
