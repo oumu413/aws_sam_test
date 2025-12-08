@@ -36,6 +36,9 @@ jobs:
           cache: 'pnpm'
           cache-dependency-path: backend/pnpm-lock.yaml
 
+      - name: Install esbuild globally
+        run: npm install -g esbuild@0.25.12
+
 
       ### Lambda Aurhorizer & Operations Build ###
       - name: Install Lambda Operations Dependencies
