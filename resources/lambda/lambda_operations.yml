@@ -50,13 +50,11 @@ Resources:
       FunctionName: operations-authorizer-function
       CodeUri: ../../backend/authorizer/operations/dist
       Handler: index.handler
-      Runtime: nodejs22.x
       Role: !GetAtt OperationsAuthorizerExecutionRole.Arn
       MemorySize: 256
       Timeout: 30
       Environment:
         Variables:
-          NODE_OPTIONS: "--enable-source-maps"
           OPERATIONS_USERS_USER_POOL_REGION: !Ref "AWS::Region"
           OPERATIONS_USERS_USER_POOL: !ImportValue Operations-UserPoolId
           OPERATIONS_USERS_APP_CLIENT: !ImportValue Operations-UserPoolClientId
@@ -85,7 +83,7 @@ Resources:
             EnableSimpleResponses: true
             Identity:
               Header: Authorization
-              ReauthorizeEvery: 0
+              ReauthorizeEvery: 900 # 15分キャッシュ
 
 ###################################################################################
 ## 管理者サイト用 Users Service Lambda Function
@@ -107,7 +105,7 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
       Policies:
-        - PolicyName: operations-authorizer-execution-policy
+        - PolicyName: operations-execution-policy
           PolicyDocument:
             Version: 2012-10-17
             Statement:
@@ -132,7 +130,8 @@ Resources:
             ApiId: !Ref OperationsHttpApi
             Path: /users/{proxy+} 
             Method: ANY
-
+            #Auth:
+            #  Authorizer: NONE
 Outputs:
   OperationsHttpApiId:
     Value: !Ref OperationsHttpApi

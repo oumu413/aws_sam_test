@@ -1,5 +1,6 @@
 import express from 'express'
 import serverlessExpress from '@codegenie/serverless-express'
+import logger from '@commons/logger'
 
 const app = express()
 
@@ -13,6 +14,7 @@ interface UserProfile {
 }
 
 app.get('/profile', (req, res) => {
+  logger.info('GET /profile called')
   const users: UserProfile[] = [
     {
       id: '1',
@@ -31,6 +33,7 @@ app.get('/profile', (req, res) => {
 })
 
 app.put('/profile', (req, res) => {
+  logger.info('PUT /profile called')
   const users: UserProfile[] = [
     {
       id: '3',
