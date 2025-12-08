@@ -48,7 +48,7 @@ Resources:
     DependsOn: OperationsAuthorizerExecutionRole
     Properties:
       FunctionName: operations-authorizer-function
-      CodeUri: backend/authorizer/operations/dist
+      CodeUri: backend/authorizer/operations
       Handler: index.handler
       Role: !GetAtt OperationsAuthorizerExecutionRole.Arn
       MemorySize: 256
@@ -58,6 +58,17 @@ Resources:
           OPERATIONS_USERS_USER_POOL_REGION: !Ref "AWS::Region"
           OPERATIONS_USERS_USER_POOL: !ImportValue Operations-UserPoolId
           OPERATIONS_USERS_APP_CLIENT: !ImportValue Operations-UserPoolClientId
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Format: esm
+        Minify: false
+        OutExtension:
+          - .js=.mjs
+        Target: "es2022"
+        Sourcemap: true
+        EntryPoints: 
+          - src/index.ts
 
   OperationsHttpApi:
     Type: AWS::Serverless::HttpApi
