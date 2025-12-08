@@ -7,9 +7,6 @@ on:
       - develop   # 開発環境
     paths:
     - frontend/operations/**
-    - backend/commons/auth_manager/**
-    - backend/commons/logger/**
-    - backend/authorizer/operations/**
     - resources/userinterface/userinterface_operations.yml
   workflow_dispatch:
     
