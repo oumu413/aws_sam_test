@@ -72,14 +72,14 @@ jobs:
 
       ### SAM Deploy ###
       - name: SAM Build
-        run: sam build --template-file lambda_operations.yml
-        working-directory: resources/lambda
+        run: sam build --template-file resources/lambda/lambda_operations.yml --base-dir $GITHUB_WORKSPACE
+        working-directory: 
 
       - name: SAM Deploy
         run: |
           sam deploy \
             --template-file resources/lambda/lambda_operations.yml \
-            --base-dir . \
+            --base-dir $GITHUB_WORKSPAC \
             --stack-name lambda-operations \
             --resolve-s3 \
             --parameter-overrides \
@@ -87,4 +87,3 @@ jobs:
             --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM \
             --no-confirm-changeset \
             --no-fail-on-empty-changeset
-        working-directory: .
