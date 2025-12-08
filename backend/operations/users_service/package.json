@@ -4,7 +4,7 @@
   "description": "Lambda Function operations_users_service",
   "type": "module",
   "scripts": {
-    "build": "esbuild src/index.ts --bundle --minify --sourcemap --platform=node --format=esm --outfile=dist/index.js",
+    "build": "esbuild src/index.ts --bundle --minify --sourcemap --platform=node --format=esm --outfile=dist/index.mjs",
     "start:dev": "nodemon --watch src -e ts --exec \"node dist/index.js\"",
     "tsc": "tsc"
   },
