@@ -54,9 +54,9 @@ jobs:
         run: pnpm --filter @authorizer/operations build
         working-directory: backend
 
-      - name: Lambda Operations Build(operations)
-        run: pnpm --filter @operations/* build
-        working-directory: backend
+      #- name: Lambda Operations Build(operations)
+      #  run: pnpm --filter @operations/* build
+      #  working-directory: backend
 
 
       ### AWS Credentials ###
