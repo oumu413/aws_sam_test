@@ -10,12 +10,13 @@
   },
   "dependencies": {
     "@codegenie/serverless-express": "^4.17.0",
-    "express": "^5.1.0",
     "@commons/auth_manager": "file:../../commons/auth_manager",
-    "@commons/logger": "file:../../commons/logger"
+    "@commons/logger": "file:../../commons/logger",
+    "express": "^5.1.0"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.158",
-    "@types/express": "^4.17.25"
+    "@types/express": "^4.17.25",
+    "esbuild": "^0.25.12"
   }
 }
