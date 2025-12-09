@@ -132,7 +132,7 @@ Resources:
     Properties:
       FunctionName: operations-users-function
       CodeUri: ../../backend/operations/users_service
-      Handler: dist/index.handler
+      Handler: index.handler
       Role: !GetAtt OperationsExecutionRole.Arn
       Events:
         ProxyApi:
