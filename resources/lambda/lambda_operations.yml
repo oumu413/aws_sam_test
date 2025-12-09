@@ -146,7 +146,8 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Format: esm
+        Format: cjs
+        Target: node22
         Minify: false
         OutExtension:
           - .js=.mjs
