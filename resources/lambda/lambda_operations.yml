@@ -45,7 +45,6 @@ Resources:
 
   OperationsAuthorizerFunction:
     Type: AWS::Serverless::Function
-    DependsOn: OperationsAuthorizerExecutionRole
     Properties:
       FunctionName: operations-authorizer-function
       CodeUri: ../../backend/authorizer/operations
@@ -72,7 +71,6 @@ Resources:
 
   OperationsHttpApi:
     Type: AWS::Serverless::HttpApi
-    DependsOn: OperationsAuthorizerFunction
     Properties:
       Name: operations-http-api
       CorsConfiguration:
@@ -129,7 +127,6 @@ Resources:
 
   OperationsUsersFunction:
     Type: AWS::Serverless::Function
-    DependsOn: OperationsHttpApi
     Properties:
       FunctionName: operations-users-function
       CodeUri: ../../backend/operations/users_service
