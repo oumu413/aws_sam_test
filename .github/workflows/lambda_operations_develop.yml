@@ -44,6 +44,10 @@ jobs:
       - name: Install Lambda Operations Dependencies
         run: pnpm install --frozen-lockfile
         working-directory: backend
+
+      - name: Lambda Operations Build(all)
+        run: pnpm run build
+        working-directory: backend
         
 #      - name: Lambda Operations Build(common)
 #        run: |
