@@ -71,8 +71,8 @@ jobs:
 
 
       ### SAM Deploy ###
-      - name: SAM Build
-        run: sam build --template-file resources/lambda/lambda_operations.yml --base-dir $GITHUB_WORKSPACE
+#      - name: SAM Build
+#        run: sam build -t resources/lambda/lambda_operations.yml --base-dir $GITHUB_WORKSPACE
 
       - name: SAM Deploy
         run: |

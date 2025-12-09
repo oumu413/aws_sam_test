@@ -23,14 +23,17 @@ importers:
 
   authorizer/operations:
     dependencies:
+      '@aws-lambda-powertools/logger':
+        specifier: ^2.29.0
+        version: 2.29.0
       '@aws-sdk/client-rds-data':
         specifier: ^3.940.0
         version: 3.940.0
       '@commons/auth_manager':
-        specifier: file:../../commons/auth_manager
+        specifier: workspace:*
         version: link:../../commons/auth_manager
       '@commons/logger':
-        specifier: file:../../commons/logger
+        specifier: workspace:*
         version: link:../../commons/logger
       aws-lambda:
         specifier: ^1.0.7
@@ -95,14 +98,17 @@ importers:
 
   operations/users_service:
     dependencies:
+      '@aws-lambda-powertools/logger':
+        specifier: ^2.29.0
+        version: 2.29.0
       '@codegenie/serverless-express':
         specifier: ^4.17.0
         version: 4.17.0
       '@commons/auth_manager':
-        specifier: file:../../commons/auth_manager
+        specifier: workspace:*
         version: link:../../commons/auth_manager
       '@commons/logger':
-        specifier: file:../../commons/logger
+        specifier: workspace:*
         version: link:../../commons/logger
       express:
         specifier: ^5.1.0
