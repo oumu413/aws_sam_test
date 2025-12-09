@@ -27,10 +27,10 @@ importers:
         specifier: ^3.940.0
         version: 3.940.0
       '@commons/auth_manager':
-        specifier: workspace:*
+        specifier: file:../../commons/auth_manager
         version: link:../../commons/auth_manager
       '@commons/logger':
-        specifier: workspace:*
+        specifier: file:../../commons/logger
         version: link:../../commons/logger
       aws-lambda:
         specifier: ^1.0.7
@@ -99,10 +99,10 @@ importers:
         specifier: ^4.17.0
         version: 4.17.0
       '@commons/auth_manager':
-        specifier: workspace:*
+        specifier: file:../../commons/auth_manager
         version: link:../../commons/auth_manager
       '@commons/logger':
-        specifier: workspace:*
+        specifier: file:../../commons/logger
         version: link:../../commons/logger
       express:
         specifier: ^5.1.0
