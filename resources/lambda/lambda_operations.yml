@@ -149,9 +149,9 @@ Resources:
         Format: cjs
         Target: node22
         Minify: false
-        OutExtension:
-          - .js=.mjs
-        Target: "es2022"
+#        OutExtension:
+#          - .js=.mjs
+#        Target: "es2022"
         Sourcemap: true
         EntryPoints: 
           - src/index.ts
