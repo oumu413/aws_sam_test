@@ -48,7 +48,7 @@ Resources:
     DependsOn: OperationsAuthorizerExecutionRole
     Properties:
       FunctionName: operations-authorizer-function
-      CodeUri: backend/authorizer/operations
+      CodeUri: ../../backend/authorizer/operations
       Handler: dist/index.handler
       Role: !GetAtt OperationsAuthorizerExecutionRole.Arn
       MemorySize: 256
@@ -131,7 +131,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: operations-users-function
-      CodeUri: backend/operations/users_service
+      CodeUri: ../../backend/operations/users_service
       Handler: dist/index.handler
       Role: !GetAtt OperationsExecutionRole.Arn
       Events:
