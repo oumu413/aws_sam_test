@@ -48,8 +48,8 @@ Resources:
     DependsOn: OperationsAuthorizerExecutionRole
     Properties:
       FunctionName: operations-authorizer-function
-      CodeUri: backend/authorizer/operations/dist
-      Handler: index.handler
+      CodeUri: backend/authorizer/operations
+      Handler: dist/index.handler
       Role: !GetAtt OperationsAuthorizerExecutionRole.Arn
       MemorySize: 256
       Timeout: 30
@@ -131,8 +131,8 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: operations-users-function
-      CodeUri: backend/operations/users_service/dist
-      Handler: index.handler
+      CodeUri: backend/operations/users_service
+      Handler: dist/index.handler
       Role: !GetAtt OperationsExecutionRole.Arn
       Events:
         ProxyApi:
