@@ -29,12 +29,6 @@ importers:
       '@aws-sdk/client-rds-data':
         specifier: ^3.940.0
         version: 3.940.0
-      '@commons/auth_manager':
-        specifier: workspace:*
-        version: link:../../commons/auth_manager
-      '@commons/logger':
-        specifier: workspace:*
-        version: link:../../commons/logger
       aws-lambda:
         specifier: ^1.0.7
         version: 1.0.7
@@ -104,12 +98,6 @@ importers:
       '@codegenie/serverless-express':
         specifier: ^4.17.0
         version: 4.17.0
-      '@commons/auth_manager':
-        specifier: workspace:*
-        version: link:../../commons/auth_manager
-      '@commons/logger':
-        specifier: workspace:*
-        version: link:../../commons/logger
       express:
         specifier: ^5.1.0
         version: 5.2.1

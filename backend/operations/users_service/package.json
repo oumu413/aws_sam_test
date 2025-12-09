@@ -4,15 +4,13 @@
   "description": "Lambda Function operations_users_service",
   "type": "module",
   "scripts": {
-    "build": "esbuild src/index.ts --bundle --minify --sourcemap --platform=node --format=esm --outfile=index.js",
+    "build": "esbuild src/index.ts --bundle --minify --sourcemap --platform=node --format=esm --outfile=dist/index.js",
     "start:dev": "nodemon --watch src -e ts --exec \"node dist/index.js\"",
     "tsc": "tsc"
   },
   "dependencies": {
     "@aws-lambda-powertools/logger": "^2.29.0",
     "@codegenie/serverless-express": "^4.17.0",
-    "@commons/auth_manager": "workspace:*",
-    "@commons/logger": "workspace:*",
     "express": "^5.1.0"
   },
   "devDependencies": {

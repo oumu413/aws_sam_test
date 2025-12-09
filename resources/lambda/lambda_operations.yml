@@ -58,17 +58,17 @@ Resources:
           OPERATIONS_USERS_USER_POOL_REGION: !Ref "AWS::Region"
           OPERATIONS_USERS_USER_POOL: !ImportValue Operations-UserPoolId
           OPERATIONS_USERS_APP_CLIENT: !ImportValue Operations-UserPoolClientId
-#    Metadata:
-#      BuildMethod: esbuild
-#      BuildProperties:
-#        Format: esm
-#        Minify: false
-#        OutExtension:
-#          - .js=.mjs
-#        Target: "es2022"
-#        Sourcemap: true
-#        EntryPoints: 
-#          - src/index.ts
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Format: esm
+        Minify: false
+        OutExtension:
+          - .js=.mjs
+        Target: "es2022"
+        Sourcemap: true
+        EntryPoints: 
+          - src/index.ts
 
   OperationsHttpApi:
     Type: AWS::Serverless::HttpApi
@@ -132,7 +132,7 @@ Resources:
     Properties:
       FunctionName: operations-users-function
       CodeUri: ../../backend/operations/users_service
-      Handler: index.handler
+      Handler: dist/index.handler
       Role: !GetAtt OperationsExecutionRole.Arn
       Events:
         ProxyApi:
@@ -143,17 +143,17 @@ Resources:
             Method: ANY
             #Auth:
             #  Authorizer: NONE
-#    Metadata:
-#      BuildMethod: esbuild
-#      BuildProperties:
-#        Format: esm
-#        Minify: false
-#        OutExtension:
-#          - .js=.mjs
-#        Target: "es2022"
-#        Sourcemap: true
-#        EntryPoints: 
-#          - src/index.ts
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Format: esm
+        Minify: false
+        OutExtension:
+          - .js=.mjs
+        Target: "es2022"
+        Sourcemap: true
+        EntryPoints: 
+          - src/index.ts
 Outputs:
   OperationsHttpApiId:
     Value: !Ref OperationsHttpApi

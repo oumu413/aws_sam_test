@@ -1,6 +1,6 @@
 import express from 'express'
 import serverlessExpress from '@codegenie/serverless-express'
-import logger from '@commons/logger'
+import logger from './logger.ts'
 
 const app = express()
 
