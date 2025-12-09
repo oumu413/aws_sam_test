@@ -134,11 +134,11 @@ Resources:
       Handler: dist/index.handler
       Role: !GetAtt OperationsExecutionRole.Arn
       Events:
-        ProxyApi:
+        HttpApiEvent:
           Type: HttpApi
           Properties:
             ApiId: !Ref OperationsHttpApi
-            Path: /users/{proxy+} 
+            Path: /users
             Method: ANY
             #Auth:
             #  Authorizer: NONE
