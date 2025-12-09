@@ -129,6 +129,7 @@ Resources:
 
   OperationsUsersFunction:
     Type: AWS::Serverless::Function
+    DependsOn: OperationsHttpApi
     Properties:
       FunctionName: operations-users-function
       CodeUri: ../../backend/operations/users_service
