@@ -51,7 +51,7 @@ app.put('/profile', (req, res) => {
   res.json(users)
 })
 
-export const handler = serverlessExpress.configure({ app })
+export const handler = serverlessExpress({ app })
 
 //export const handler = () => {
 //  console.log("This is a placeholder handler.");
