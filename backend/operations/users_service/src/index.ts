@@ -68,7 +68,7 @@ app.use((_: Request, res: Response): void => {
   res.status(404).send({ error: "Not Found!" });
 });
 
-export const handler = serverlessExpress({ app })
+export const handler = serverlessExpress.configure({ app })
 
 //export const handler = () => {
 //  console.log("This is a placeholder handler.");
