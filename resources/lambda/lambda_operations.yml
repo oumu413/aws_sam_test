@@ -69,6 +69,14 @@ Resources:
         EntryPoints: 
           - src/index.ts
 
+  OperationsAuthorizerFunctionPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !GetAtt OperationsAuthorizerFunction.Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${OperationsHttpApi}/*'
+
   OperationsHttpApi:
     Type: AWS::Serverless::HttpApi
     Properties:
@@ -138,7 +146,7 @@ Resources:
           Type: HttpApi
           Properties:
             ApiId: !Ref OperationsHttpApi
-            Path: /users
+            Path: /users/{proxy+}
             Method: ANY
             PayloadFormatVersion: "2.0"
             #Auth:
