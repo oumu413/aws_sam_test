@@ -64,10 +64,6 @@ app.put('/profile', (req: Request, res: Response) => {
   res.json(users)
 })
 
-app.use((_: Request, res: Response): void => {
-  res.status(404).send({ error: "Not Found!" });
-});
-
 export const handler = serverlessExpress.configure({ app })
 
 //export const handler = () => {
