@@ -145,10 +145,10 @@ Resources:
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
-        Format: esm
+        Format: cjs
         Minify: false
-        OutExtension:
-          - .js=.mjs
+#       OutExtension:
+#         - .js=.mjs
         Target: "es2022"
         Sourcemap: true
         EntryPoints: 
