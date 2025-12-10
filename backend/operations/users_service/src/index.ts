@@ -1,4 +1,4 @@
-import express from 'express'
+import express, { Request, Response }  from 'express'
 import serverlessExpress from '@codegenie/serverless-express'
 import logger from './logger.ts'
 
@@ -13,7 +13,7 @@ interface UserProfile {
   createdAt: string
 }
 
-app.get('/profile', (req, res) => {
+app.get('/profile', (req: Request, res: Response) => {
   logger.info('GET /profile called')
   const users: UserProfile[] = [
     {
@@ -32,7 +32,7 @@ app.get('/profile', (req, res) => {
   res.json(users)
 })
 
-app.put('/profile', (req, res) => {
+app.put('/profile', (req: Request, res: Response) => {
   logger.info('PUT /profile called')
   const users: UserProfile[] = [
     {
@@ -51,7 +51,11 @@ app.put('/profile', (req, res) => {
   res.json(users)
 })
 
-export const handler = serverlessExpress({ app })
+app.use((_: Request, res: Response): void => {
+  res.status(404).send({ error: "Not Found!" });
+});
+
+export const handler = serverlessExpress.configure({ app })
 
 //export const handler = () => {
 //  console.log("This is a placeholder handler.");
