@@ -140,6 +140,7 @@ Resources:
             ApiId: !Ref OperationsHttpApi
             Path: /users
             Method: ANY
+            PayloadFormatVersion: 2.0
             #Auth:
             #  Authorizer: NONE
     Metadata:
