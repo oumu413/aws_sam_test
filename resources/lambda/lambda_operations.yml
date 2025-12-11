@@ -107,74 +107,72 @@ Resources:
 ###################################################################################
 ## 管理者サイト用 Users Service Lambda Function
 ###################################################################################
-#  OperationsExecutionRole:
-#    Type: AWS::IAM::Role
-#    Properties:
-#      RoleName: operations-execution-role
-#      Path: '/'
-#      AssumeRolePolicyDocument:
-#        Version: 2012-10-17
-#        Statement:
-#          - Effect: Allow
-#            Principal:
-#              Service:
-#                - lambda.amazonaws.com
-#            Action:
-#              - sts:AssumeRole
-#      ManagedPolicyArns:
-#        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-#      Policies:
-#        - PolicyName: operations-execution-policy
-#          PolicyDocument:
-#            Version: 2012-10-17
-#            Statement:
-#              - Effect: Allow
-#                Action:
-#                  - cognito-idp:List*
-#                Resource: !Sub
-#                  - arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${OperationsUserPool}
-#                  - { OperationsUserPool: !ImportValue Operations-UserPoolId }
-#
-#  OperationsUsersFunction:
-#    Type: AWS::Serverless::Function
-#    Properties:
-#      FunctionName: operations-users-function
-#      CodeUri: ../../backend/operations/users_service
-#      Handler: dist/index.handler
-#      Role: !GetAtt OperationsExecutionRole.Arn
-#      Events:
-#        HttpApiEvent:
-#          Type: HttpApi
-#          Properties:
-#            ApiId: !Ref OperationsHttpApi
-#            Path: /users/{proxy+}
-#            Method: ANY
-#            PayloadFormatVersion: "2.0"
-#            #Auth:
-#            #  Authorizer: NONE
-#    Metadata:
-#      BuildMethod: esbuild
-#      BuildProperties:
-#        Format: cjs
-#        Minify: false
-##       OutExtension:
-##         - .js=.mjs
-#        Target: "es2022"
-#        Sourcemap: true
-#        EntryPoints: 
-#          - src/index.ts
-#          
-#  OperationsUsersFunctionPermission:
-#    Type: AWS::Lambda::Permission
-#    Properties:
-#      Action: lambda:InvokeFunction
-#      FunctionName: !GetAtt OperationsUsersFunction.Arn
-#      Principal: apigateway.amazonaws.com
-#      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${OperationsHttpApi}/*'
+  OperationsExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: operations-execution-role
+      Path: '/'
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: operations-execution-policy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - cognito-idp:List*
+                Resource: !Sub
+                  - arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${OperationsUserPool}
+                  - { OperationsUserPool: !ImportValue Operations-UserPoolId }
 
-#Outputs:
-#  OperationsHttpApiId:
-#    Value: !Ref OperationsHttpApi
-#    Description: Operations HTTP API ID
-#    Export:
-#      Name: Operations-HttpApiId
+  OperationsUsersFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: operations-users-function
+      CodeUri: ../../backend/operations/users_service
+      Handler: dist/index.handler
+      Role: !GetAtt OperationsExecutionRole.Arn
+      Events:
+        HttpApiEvent:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref OperationsHttpApi
+            Path: /users/{proxy+}
+            Method: ANY
+            PayloadFormatVersion: "2.0"
+            #Auth:
+            #  Authorizer: NONE
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Format: cjs
+        Minify: false
+        Target: "es2022"
+        Sourcemap: true
+        EntryPoints: 
+          - src/index.ts
+          
+  OperationsUsersFunctionPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !GetAtt OperationsUsersFunction.Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${OperationsHttpApi}/*'
+
+Outputs:
+  OperationsHttpApiId:
+    Value: !Ref OperationsHttpApi
+    Description: Operations HTTP API ID
+    Export:
+      Name: Operations-HttpApiId
