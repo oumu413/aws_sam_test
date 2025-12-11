@@ -1,6 +1,6 @@
 import express, { Request, Response }  from 'express'
 import serverlessExpress from '@codegenie/serverless-express'
-import logger from './logger.ts'
+import logger from '@commons/logger'
 
 const app = express()
 
@@ -12,19 +12,6 @@ interface UserProfile {
   email: string
   createdAt: string
 }
-
-
-import { EventEmitter } from 'events'
-
-app.use((req, res, next) => {
-  console.log('req.constructor:', req?.constructor?.name)   // 期待: IncomingMessage
-  console.log('res.constructor:', res?.constructor?.name)   // 期待: ServerResponse
-  console.log('req instanceof EventEmitter?', req instanceof EventEmitter) // 期待: true
-  console.log('res instanceof EventEmitter?', res instanceof EventEmitter) // 期待: true
-  console.log('req.socket instanceof EventEmitter?', req.socket instanceof EventEmitter) // 期待: true
-  next()
-})
-
 
 app.get('/profile', (req: Request, res: Response) => {
   logger.info('GET /profile called')
@@ -64,8 +51,4 @@ app.put('/profile', (req: Request, res: Response) => {
   res.json(users)
 })
 
-export const handler = serverlessExpress.configure({ app })
-
-//export const handler = () => {
-//  console.log("This is a placeholder handler.");
-//}
+export const handler = serverlessExpress({ app })

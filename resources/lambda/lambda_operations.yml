@@ -30,7 +30,7 @@ Resources:
         AllowOrigins:
           - "*"
       Auth:
-#        DefaultAuthorizer: LambdaAuthorizer
+        DefaultAuthorizer: MyLambdaAuthorizer
         Authorizers:
           MyLambdaAuthorizer:
             AuthorizerPayloadFormatVersion: 2.0

@@ -1,7 +1,7 @@
 import { APIGatewayRequestAuthorizerEventV2, APIGatewaySimpleAuthorizerWithContextResult } from 'aws-lambda'
 import { jwtVerify, createRemoteJWKSet, JWTPayload } from "jose"
-import  logger  from "./logger.ts"
-import authManager, { UserRoles } from "./auth_manager.ts"
+import  logger  from "@commons/logger"
+import authManager, { UserRoles } from "@commons/auth_manager"
 
 type AuthContext = {
   userName?: string
