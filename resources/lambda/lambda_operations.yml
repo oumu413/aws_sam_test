@@ -20,16 +20,16 @@ Resources:
     Properties:
       StageName: api
       Name: operations-http-api
-      CorsConfiguration:
-        AllowMethods:
-          - GET
-          - DELETE
-          - OPTIONS
-        AllowHeaders:
-          - Content-Type
-          - Authorization
-        AllowOrigins:
-          - "*"
+#      CorsConfiguration:
+#        AllowMethods:
+#          - GET
+#          - DELETE
+#          - OPTIONS
+#        AllowHeaders:
+#          - Content-Type
+#          - Authorization
+#        AllowOrigins:
+#          - "*"
       Auth:
         DefaultAuthorizer: OperationsApiAuthorizer
         Authorizers:
