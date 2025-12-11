@@ -30,7 +30,7 @@ jobs:
         run: |
           sam deploy \
             --template-file cognito_operations.yml \
-            --stack-name cognito-operations \
+            --stack-name operations-cognito \
             --parameter-overrides \
               DomainName=${{ secrets.DOMAIN_NAME_DEV }} \
             --no-confirm-changeset \

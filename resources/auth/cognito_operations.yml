@@ -79,9 +79,9 @@ Resources:
         - email
         - openid
         - profile
-      WriteAttributes:
-        - "email"
-        - "custom:userRole"
+#      WriteAttributes:
+#        - "email"
+#        - "custom:userRole"
 
 #  CognitoOperationsGroup:
 #    Type: AWS::Cognito::UserPoolGroup
