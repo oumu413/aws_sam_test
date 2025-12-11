@@ -18,20 +18,19 @@ Resources:
   OperationsHttpApi:
     Type: AWS::Serverless::HttpApi
     Properties:
-      StageName: api
       Name: operations-http-api
-#      CorsConfiguration:
-#        AllowMethods:
-#          - GET
-#          - DELETE
-#          - OPTIONS
-#        AllowHeaders:
-#          - Content-Type
-#          - Authorization
-#        AllowOrigins:
-#          - "*"
+      CorsConfiguration:
+        AllowMethods:
+          - GET
+          - DELETE
+          - OPTIONS
+        AllowHeaders:
+          - Content-Type
+          - Authorization
+        AllowOrigins:
+          - "*"
       Auth:
-        DefaultAuthorizer: OperationsApiAuthorizer
+#        DefaultAuthorizer: OperationsApiAuthorizer
         Authorizers:
           OperationsApiAuthorizer:
             AuthorizerPayloadFormatVersion: 2.0
@@ -39,7 +38,8 @@ Resources:
             EnableSimpleResponses: true
 #            EnableFunctionDefaultPermissions: true
             Identity:
-              Header: x-origin-verify
+              Header: 
+                - x-origin-verify
               ReauthorizeEvery: 900 # 15分キャッシュ
 
   OperationsAuthorizerExecutionRole:
@@ -69,6 +69,7 @@ Resources:
                 Resource: !Sub
                   - arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${OperationsUsersUserPool}
                   - { OperationsUsersUserPool: !ImportValue Operations-UserPoolId }
+
   OperationsAuthorizerFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -94,13 +95,14 @@ Resources:
         Sourcemap: true
         EntryPoints: 
           - src/index.ts
+
   OperationsAuthorizerFunctionPermission:
     Type: AWS::Lambda::Permission
     Properties:
       Action: lambda:InvokeFunction
       FunctionName: !GetAtt OperationsAuthorizerFunction.Arn
       Principal: apigateway.amazonaws.com
-      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${OperationsHttpApi}/authorizers/*'
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${OperationsHttpApi}*'
 
 
 ###################################################################################
