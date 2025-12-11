@@ -102,7 +102,7 @@ Resources:
       Action: lambda:InvokeFunction
       FunctionName: !GetAtt OperationsAuthorizerFunction.Arn
       Principal: apigateway.amazonaws.com
-      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${OperationsHttpApi}/*'
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${OperationsHttpApi}*'
 
 
 ###################################################################################
