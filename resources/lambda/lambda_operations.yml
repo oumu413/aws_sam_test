@@ -2,98 +2,45 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: Lambda Functions for Operations Site
 
+Globals:
+  Function:
+    Runtime: nodejs22.x
+    MemorySize: 256
+    Timeout: 30
+    Environment:
+      Variables:
+        NODE_OPTIONS: "--enable-source-maps"
+
 Resources:
-  # API Gateway
-  hogehogeApi:
+###################################################################################
+## 管理者サイト用 API Gateway(HTTP API) ＆ Lambda Authorizer
+###################################################################################
+  OperationsHttpApi:
     Type: AWS::Serverless::HttpApi
     Properties:
-      StageName: api # apiパスで切る
+      Name: operations-http-api
+      CorsConfiguration:
+        AllowMethods:
+          - GET
+          - DELETE
+          - OPTIONS
+        AllowHeaders:
+          - Content-Type
+          - Authorization
+        AllowOrigins:
+          - "*"
       Auth:
-        DefaultAuthorizer: LambdaAuthorizer
+        DefaultAuthorizer: OperationsApiAuthorizer
         Authorizers:
-          LambdaAuthorizer:
+          OperationsApiAuthorizer:
             AuthorizerPayloadFormatVersion: 2.0
-            FunctionArn: !GetAtt AuthorizerFunction.Arn
-            EnableSimpleResponses: true # 2.0形式ではSimpleResponses形式で書くことができるので有効化
+            FunctionArn: !GetAtt OperationsAuthorizerFunction.Arn
+            EnableSimpleResponses: true
+#            EnableFunctionDefaultPermissions: true
             Identity:
-              ReauthorizeEvery: 0 # キャッシュ無効化。リクエストごとに認証を行う
-              Headers:
-                - x-origin-verify
+              Header: Authorization
+              ReauthorizeEvery: 900 # 15分キャッシュ
 
-  # Lambda Functions
-  AuthorizerFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: src/
-      Handler: handlers/authorizerHandler.lambdaHandler
-      Policies:
-        - Statement:
-          - Effect: Allow
-            Action:
-              - secretsmanager:GetSecretValue
-            Resource:
-              - !Sub 'arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${SecretName}-*'
-      Environment:
-        Variables:
-          ORIGIN_VERIFY_TOKEN: !Ref OriginVerifyToken
-          SECRET_NAME: !Ref SecretName
-    Metadata:
-      BuildMethod: esbuild
-      BuildProperties:
-        EntryPoints:
-          - handlers/authorizerHandler.ts
-        External:
-          - "@aws-sdk/*"
-          - aws-sdk
-        Minify: false
-  # Permissions
-  AuthorizerFunctionPermission:
-    Type: AWS::Lambda::Permission
-    Properties:
-      Action: lambda:InvokeFunction
-      FunctionName: !GetAtt AuthorizerFunction.Arn
-      Principal: apigateway.amazonaws.com
-      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${SrcLogsApi}/*' 
-
-#Globals:
-#  Function:
-#    Runtime: nodejs22.x
-#    MemorySize: 256
-#    Timeout: 30
-#    Environment:
-#      Variables:
-#        NODE_OPTIONS: "--enable-source-maps"
-#
-#Resources:
-####################################################################################
-### 管理者サイト用 API Gateway(HTTP API) ＆ Lambda Authorizer
-####################################################################################
-#  OperationsHttpApi:
-#    Type: AWS::Serverless::HttpApi
-#    Properties:
-#      Name: operations-http-api
-#      CorsConfiguration:
-#        AllowMethods:
-#          - GET
-#          - DELETE
-#          - OPTIONS
-#        AllowHeaders:
-#          - Content-Type
-#          - Authorization
-#        AllowOrigins:
-#          - "*"
-#      Auth:
-#        DefaultAuthorizer: OperationsApiAuthorizer
-#        Authorizers:
-#          OperationsApiAuthorizer:
-#            AuthorizerPayloadFormatVersion: 2.0
-#            FunctionArn: !GetAtt OperationsAuthorizerFunction.Arn
-#            EnableSimpleResponses: true
-##            EnableFunctionDefaultPermissions: true
-#            Identity:
-#              Header: Authorization
-#              ReauthorizeEvery: 900 # 15分キャッシュ
-#
 #  OperationsAuthorizerExecutionRole:
 #    Type: AWS::IAM::Role
 #    Properties:
@@ -121,40 +68,40 @@ Resources:
 #                Resource: !Sub
 #                  - arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${OperationsUsersUserPool}
 #                  - { OperationsUsersUserPool: !ImportValue Operations-UserPoolId }
-#
-#  OperationsAuthorizerFunction:
-#    Type: AWS::Serverless::Function
-#    Properties:
-#      FunctionName: operations-authorizer-function
-#      CodeUri: ../../backend/authorizer/operations
-#      Handler: dist/index.handler
+
+  OperationsAuthorizerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: operations-authorizer-function
+      CodeUri: ../../backend/authorizer/operations
+      Handler: dist/index.handler
 #      Role: !GetAtt OperationsAuthorizerExecutionRole.Arn
-#      MemorySize: 256
-#      Timeout: 30
-#      Environment:
-#        Variables:
-#          OPERATIONS_USERS_USER_POOL_REGION: !Ref "AWS::Region"
-#          OPERATIONS_USERS_USER_POOL: !ImportValue Operations-UserPoolId
-#          OPERATIONS_USERS_APP_CLIENT: !ImportValue Operations-UserPoolClientId
-#    Metadata:
-#      BuildMethod: esbuild
-#      BuildProperties:
-#        Format: esm
-#        Minify: false
-#        OutExtension:
-#          - .js=.mjs
-#        Target: "es2022"
-#        Sourcemap: true
-#        EntryPoints: 
-#          - src/index.ts
-#
-#  OperationsAuthorizerFunctionPermission:
-#    Type: AWS::Lambda::Permission
-#    Properties:
-#      Action: lambda:InvokeFunction
-#      FunctionName: !GetAtt OperationsAuthorizerFunction.Arn
-#      Principal: apigateway.amazonaws.com
-#      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${OperationsHttpApi}/authorizers/*'
+      MemorySize: 256
+      Timeout: 30
+      Environment:
+        Variables:
+          OPERATIONS_USERS_USER_POOL_REGION: !Ref "AWS::Region"
+          OPERATIONS_USERS_USER_POOL: !ImportValue Operations-UserPoolId
+          OPERATIONS_USERS_APP_CLIENT: !ImportValue Operations-UserPoolClientId
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Format: esm
+        Minify: false
+        OutExtension:
+          - .js=.mjs
+        Target: "es2022"
+        Sourcemap: true
+        EntryPoints: 
+          - src/index.ts
+
+  OperationsAuthorizerFunctionPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !GetAtt OperationsAuthorizerFunction.Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${OperationsHttpApi}/authorizers/*'
 
 
 ###################################################################################
