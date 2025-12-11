@@ -84,32 +84,12 @@ Resources:
           OPERATIONS_USERS_USER_POOL_REGION: !Ref "AWS::Region"
           OPERATIONS_USERS_USER_POOL: !ImportValue Operations-UserPoolId
           OPERATIONS_USERS_APP_CLIENT: !ImportValue Operations-UserPoolClientId
-#    Metadata:
-#      BuildMethod: esbuild
-#      BuildProperties:
-#        Format: esm
-#        Minify: false
-#        OutExtension:
-#          - .js=.mjs
-#        Target: "es2022"
-#        Sourcemap: true
-#        EntryPoints: 
-#          - src/index.ts
 
   OperationsAuthorizerFunctionLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
       LogGroupName: !Sub /aws/lambda/${OperationsAuthorizerFunction}
       RetentionInDays: 14
-
-#  OperationsAuthorizerFunctionPermission:
-#    Type: AWS::Lambda::Permission
-#    Properties:
-#      Action: lambda:InvokeFunction
-#      FunctionName: !GetAtt OperationsAuthorizerFunction.Arn
-#      Principal: apigateway.amazonaws.com
-#      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${OperationsHttpApi}*'
-
 
 ###################################################################################
 ## 管理者サイト用 Users Service Lambda Function
@@ -157,31 +137,12 @@ Resources:
             Path: /users/{proxy+}
             Method: ANY
             PayloadFormatVersion: "2.0"
-#            Auth:
-#              Authorizer: OperationsApiAuthorizer
-#    Metadata:
-#      BuildMethod: esbuild
-#      BuildProperties:
-#        Format: cjs
-#        Minify: false
-#        Target: "es2022"
-#        Sourcemap: true
-#        EntryPoints: 
-#          - src/index.ts
   
   OperationsUsersFunctionLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
       LogGroupName: !Sub /aws/lambda/${OperationsUsersFunction}
       RetentionInDays: 14
-          
-#  OperationsUsersFunctionPermission:
-#    Type: AWS::Lambda::Permission
-#    Properties:
-#      Action: lambda:InvokeFunction
-#      FunctionName: !GetAtt OperationsUsersFunction.Arn
-#      Principal: apigateway.amazonaws.com
-#      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${OperationsHttpApi}/*'
 
 Outputs:
   OperationsHttpApiId:

@@ -45,26 +45,9 @@ jobs:
         run: pnpm install --frozen-lockfile
         working-directory: backend
 
-      - name: Lambda Operations Build(all)
+      - name: Lambda Operations Build
         run: pnpm run build
         working-directory: backend
-        
-#      - name: Lambda Operations Build(common)
-#        run: |
-#          pnpm --filter @commons/auth_manager tsc
-#          pnpm --filter @commons/auth_manager build
-#          pnpm --filter @commons/logger tsc
-#          pnpm --filter @commons/logger build
-#        working-directory: backend
-#
-#      - name: Lambda Authorizer Build(authorizer)
-#        run: pnpm --filter @authorizer/operations build
-#        working-directory: backend
-#
-#      - name: Lambda Operations Build(operations)
-#        run: pnpm --filter @operations/* build
-#        working-directory: backend
-
 
       ### AWS Credentials ###
       - name: Configure AWS Credentials
@@ -72,7 +55,6 @@ jobs:
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN_DEV }}
           aws-region: ${{ secrets.AWS_REGION_DEV }}
-
 
       ### SAM Deploy ###
       - name: SAM Build
