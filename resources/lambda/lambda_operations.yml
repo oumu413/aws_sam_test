@@ -151,8 +151,8 @@ Resources:
             Path: /users/{proxy+}
             Method: ANY
             PayloadFormatVersion: "2.0"
-            Auth:
-              Authorizer: OperationsApiAuthorizer
+#            Auth:
+#              Authorizer: OperationsApiAuthorizer
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
@@ -163,13 +163,13 @@ Resources:
         EntryPoints: 
           - src/index.ts
           
-  OperationsUsersFunctionPermission:
-    Type: AWS::Lambda::Permission
-    Properties:
-      Action: lambda:InvokeFunction
-      FunctionName: !GetAtt OperationsUsersFunction.Arn
-      Principal: apigateway.amazonaws.com
-      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${OperationsHttpApi}/*'
+#  OperationsUsersFunctionPermission:
+#    Type: AWS::Lambda::Permission
+#    Properties:
+#      Action: lambda:InvokeFunction
+#      FunctionName: !GetAtt OperationsUsersFunction.Arn
+#      Principal: apigateway.amazonaws.com
+#      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${OperationsHttpApi}/*'
 
 Outputs:
   OperationsHttpApiId:
