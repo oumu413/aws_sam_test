@@ -4,8 +4,8 @@
   "description": "Lambda Authorizer Function",
   "type": "module",
   "scripts": {
-    "build": "esbuild src/index.ts --bundle --minify --sourcemap --platform=node --format=esm --outfile=dist/index.js",
-    "start:dev": "nodemon --watch src -e ts --exec \"node dist/index.js\"",
+    "build": "esbuild src/index.ts --bundle --minify --sourcemap --platform=node --format=esm --outfile=dist/index.mjs",
+    "start:dev": "nodemon --watch src -e ts --exec \"node dist/index.mjs\"",
     "tsc": "tsc"
   },
   "dependencies": {
