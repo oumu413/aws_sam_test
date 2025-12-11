@@ -33,7 +33,7 @@ Resources:
         DefaultAuthorizer: LambdaAuthorizer
         Authorizers:
           LambdaAuthorizer:
-            AuthorizerPayloadFormatVersion: 2.0
+            AuthorizerPayloadFormatVersion: "2.0"
             FunctionArn: !GetAtt OperationsAuthorizerFunction.Arn
             EnableSimpleResponses: true
             EnableFunctionDefaultPermissions: true
@@ -95,6 +95,12 @@ Resources:
         Sourcemap: true
         EntryPoints: 
           - src/index.ts
+
+  OperationsAuthorizerFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${OperationsAuthorizerFunction}
+      RetentionInDays: 14
 
 #  OperationsAuthorizerFunctionPermission:
 #    Type: AWS::Lambda::Permission
@@ -162,6 +168,12 @@ Resources:
         Sourcemap: true
         EntryPoints: 
           - src/index.ts
+  
+  OperationsUsersFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${OperationsUsersFunction}
+      RetentionInDays: 14
           
 #  OperationsUsersFunctionPermission:
 #    Type: AWS::Lambda::Permission
