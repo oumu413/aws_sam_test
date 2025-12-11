@@ -31,9 +31,9 @@ Resources:
         AllowOrigins:
           - "*"
       Auth:
-#        DefaultAuthorizer: MyLambdaAuthorizer
+#        DefaultAuthorizer: OperationsLambdaAuthorizer
         Authorizers:
-          MyLambdaAuthorizer:
+          OperationsLambdaAuthorizer:
             AuthorizerPayloadFormatVersion: 2.0
             FunctionArn: !GetAtt OperationsAuthorizerFunction.Arn
             EnableSimpleResponses: true

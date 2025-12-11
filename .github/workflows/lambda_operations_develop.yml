@@ -64,7 +64,7 @@ jobs:
         run: |
           sam deploy \
             --template-file .aws-sam/build/template.yaml \
-            --stack-name lambda-operations \
+            --stack-name operations-lambda \
             --resolve-s3 \
             --parameter-overrides \
               Env=dev \
