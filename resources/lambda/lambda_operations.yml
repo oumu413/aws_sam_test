@@ -30,17 +30,17 @@ Resources:
           - Authorization
         AllowOrigins:
           - "*"
-#      Auth:
-#        DefaultAuthorizer: OperationsApiAuthorizer
-#        Authorizers:
-#          OperationsApiAuthorizer:
-#            AuthorizerPayloadFormatVersion: 2.0
-#            FunctionArn: !GetAtt OperationsAuthorizerFunction.Arn
-#            EnableSimpleResponses: true
-##            EnableFunctionDefaultPermissions: true
-#            Identity:
-#              Header: Authorization
-#              ReauthorizeEvery: 900 # 15分キャッシュ
+      Auth:
+        DefaultAuthorizer: OperationsApiAuthorizer
+        Authorizers:
+          OperationsApiAuthorizer:
+            AuthorizerPayloadFormatVersion: 2.0
+            FunctionArn: !GetAtt OperationsAuthorizerFunction.Arn
+            EnableSimpleResponses: true
+#            EnableFunctionDefaultPermissions: true
+            Identity:
+              Header: x-origin-verify
+              ReauthorizeEvery: 900 # 15分キャッシュ
 
   OperationsAuthorizerExecutionRole:
     Type: AWS::IAM::Role
