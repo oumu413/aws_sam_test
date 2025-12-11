@@ -39,7 +39,7 @@ Resources:
 #            EnableFunctionDefaultPermissions: true
             Identity:
               Header: 
-                - Authorization
+                - x-origin-verify
               ReauthorizeEvery: 900 # 15分キャッシュ
 
   OperationsAuthorizerExecutionRole:
