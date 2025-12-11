@@ -15,6 +15,32 @@ Resources:
 ###################################################################################
 ## 管理者サイト用 API Gateway(HTTP API) ＆ Lambda Authorizer
 ###################################################################################
+  OperationsHttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Name: operations-http-api
+      CorsConfiguration:
+        AllowMethods:
+          - GET
+          - DELETE
+          - OPTIONS
+        AllowHeaders:
+          - Content-Type
+          - Authorization
+        AllowOrigins:
+          - "*"
+      Auth:
+        DefaultAuthorizer: OperationsApiAuthorizer
+        Authorizers:
+          OperationsApiAuthorizer:
+            AuthorizerPayloadFormatVersion: 2.0
+            FunctionArn: !GetAtt OperationsAuthorizerFunction.Arn
+            EnableSimpleResponses: true
+#            EnableFunctionDefaultPermissions: true
+            Identity:
+              Header: Authorization
+              ReauthorizeEvery: 900 # 15分キャッシュ
+
   OperationsAuthorizerExecutionRole:
     Type: AWS::IAM::Role
     Properties:
@@ -75,33 +101,8 @@ Resources:
       Action: lambda:InvokeFunction
       FunctionName: !GetAtt OperationsAuthorizerFunction.Arn
       Principal: apigateway.amazonaws.com
-      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${OperationsHttpApi}/*'
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${OperationsHttpApi}/authorizers/*'
 
-  OperationsHttpApi:
-    Type: AWS::Serverless::HttpApi
-    Properties:
-      Name: operations-http-api
-      CorsConfiguration:
-        AllowMethods:
-          - GET
-          - DELETE
-          - OPTIONS
-        AllowHeaders:
-          - Content-Type
-          - Authorization
-        AllowOrigins:
-          - "*"
-      Auth:
-        DefaultAuthorizer: OperationsApiAuthorizer
-        Authorizers:
-          OperationsApiAuthorizer:
-            AuthorizerPayloadFormatVersion: 2.0
-            FunctionArn: !GetAtt OperationsAuthorizerFunction.Arn
-            EnableSimpleResponses: true
-            EnableFunctionDefaultPermissions: true
-            Identity:
-              Header: Authorization
-              ReauthorizeEvery: 900 # 15分キャッシュ
 
 ###################################################################################
 ## 管理者サイト用 Users Service Lambda Function
