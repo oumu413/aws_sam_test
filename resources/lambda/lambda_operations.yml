@@ -30,7 +30,7 @@ Resources:
         AllowOrigins:
           - "*"
       Auth:
-#        DefaultAuthorizer: OperationsApiAuthorizer
+        DefaultAuthorizer: OperationsApiAuthorizer
         Authorizers:
           LambdaAuthorizer:
             AuthorizerPayloadFormatVersion: 2.0
