@@ -148,8 +148,8 @@ Resources:
             Path: /users/{proxy+}
             Method: ANY
             PayloadFormatVersion: "2.0"
-            #Auth:
-            #  Authorizer: NONE
+            Auth:
+              Authorizer: OperationsApiAuthorizer
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
