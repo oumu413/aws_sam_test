@@ -18,6 +18,7 @@ Resources:
   OperationsHttpApi:
     Type: AWS::Serverless::HttpApi
     Properties:
+      Stagename: api
       Name: operations-http-api
       CorsConfiguration:
         AllowMethods:
