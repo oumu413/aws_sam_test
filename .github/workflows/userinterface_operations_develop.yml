@@ -52,7 +52,7 @@ jobs:
         run: |
           sam deploy \
             --template-file userinterface_operations.yml \
-            --stack-name userinterface-operations \
+            --stack-name operations-userinterface \
             --resolve-s3 \
             --parameter-overrides \
               Env=dev \
