@@ -13,8 +13,8 @@ interface UserProfile {
   createdAt: string
 }
 
-app.get('/users/profile', (req: Request, res: Response) => {
-  logger.info('GET /users/profile called')
+app.get('/api/users/profile', (req: Request, res: Response) => {
+  logger.info('GET /api/users/profile called')
   const users: UserProfile[] = [
     {
       id: '1',
@@ -32,8 +32,8 @@ app.get('/users/profile', (req: Request, res: Response) => {
   res.json(users)
 })
 
-app.put('/users/profile', (req: Request, res: Response) => {
-  logger.info('PUT /users/profile called')
+app.put('/api/users/profile', (req: Request, res: Response) => {
+  logger.info('PUT /api/users/profile called')
   const users: UserProfile[] = [
     {
       id: '3',
