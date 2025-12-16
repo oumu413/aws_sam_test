@@ -79,7 +79,7 @@ async function validateJWT(token: string): Promise<JWTPayload | false> {
   try {
     const { payload } = await jwtVerify(token, JWKS, {
       algorithms: ["RS256"],
-      issuer: `https://cognito-idp.${region}.amazonaws.com/${operationsUsersUserPoolId}`
+      audience: operationsUsersAppClientId
     })
     return payload;
   } catch (err) {

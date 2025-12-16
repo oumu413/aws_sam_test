@@ -79,6 +79,9 @@ Resources:
         - email
         - openid
         - profile
+      ReadAttributes:
+        - "custom:userRole"
+
 #      WriteAttributes:
 #        - "email"
 #        - "custom:userRole"
