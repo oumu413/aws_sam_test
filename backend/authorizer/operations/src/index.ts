@@ -42,7 +42,7 @@ export const handler = async (
   const token = authHeader.slice("Bearer ".length)
 
   // JWT検証
-  const claims = await validateJWT(token, operationsUsersAppClientId, operationsUsersUserPoolId)
+  const claims = await validateJWT(token)
   if (!claims) {
     authResponse.context = { reason: "Unauthorized" }
     logger.error('JWT validation failed')
@@ -72,14 +72,14 @@ export const handler = async (
 }
 
 // JWTを検証する関数
-async function validateJWT(token: string, appClientId?: string, userPoolId?: string): Promise<JWTPayload | false> {
-  const jwksUrl = `https://cognito-idp.${region}.amazonaws.com/${userPoolId}/.well-known/jwks.json`
+async function validateJWT(token: string): Promise<JWTPayload | false> {
+  const jwksUrl = `https://cognito-idp.${region}.amazonaws.com/${operationsUsersUserPoolId}/.well-known/jwks.json`
   const JWKS = createRemoteJWKSet(new URL(jwksUrl))
 
   try {
     const { payload } = await jwtVerify(token, JWKS, {
       algorithms: ["RS256"],
-      audience: appClientId
+      issuer: `https://cognito-idp.${region}.amazonaws.com/${operationsUsersUserPoolId}`
     })
     return payload;
   } catch (err) {
