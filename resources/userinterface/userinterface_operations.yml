@@ -16,24 +16,24 @@ Parameters:
     Type: String
 
 Resources:
-  #OperationsSiteCloudFrontDistributionLogBucket:
-  #  Type: AWS::S3::Bucket
-  #  Properties:
-  #    BucketName: !Sub ${AppName}-operations-site-cf-log-bucket
-  #    OwnershipControls:
-  #      Rules:
-  #      - ObjectOwnership: BucketOwnerPreferred
-  #    #AccessControl: LogDeliveryWrite
-  #    PublicAccessBlockConfiguration:
-  #      BlockPublicAcls: true
-  #      BlockPublicPolicy: true
-  #      IgnorePublicAcls: true
-  #      RestrictPublicBuckets: true
-  #    LifecycleConfiguration:
-  #      Rules:
-  #        - Id: AutoDelete
-  #          Status: Enabled
-  #          ExpirationInDays: 15
+  OperationsSiteCloudFrontDistributionLogBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub ${AppName}-operations-site-cf-log-bucket
+      OwnershipControls:
+        Rules:
+        - ObjectOwnership: BucketOwnerPreferred
+      #AccessControl: LogDeliveryWrite
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      LifecycleConfiguration:
+        Rules:
+          - Id: AutoDelete
+            Status: Enabled
+            ExpirationInDays: 15
 
 ##################################################################################
 ## 管理者サイト用 S3バケット
@@ -108,9 +108,9 @@ Resources:
               OriginProtocolPolicy: https-only
               OriginSSLProtocols:
                 - TLSv1.2
-        #Logging:
-        #  IncludeCookies: false
-        #  Bucket: !Sub ${OperationsSiteCloudFrontDistributionLogBucket}.s3.${AWS::Region}.amazonaws.com
+        Logging:
+          IncludeCookies: false
+          Bucket: !Sub ${OperationsSiteCloudFrontDistributionLogBucket}.s3.${AWS::Region}.amazonaws.com
         DefaultRootObject: index.html
         DefaultCacheBehavior:
           TargetOriginId: OperationsSiteOrigin
