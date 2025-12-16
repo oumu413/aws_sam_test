@@ -8,6 +8,7 @@ on:
     paths:
     - backend/commons/auth_manager/**
     - backend/commons/logger/**
+    - backend/authorizer/operations/**
     - backend/operations/**
     - resources/lambda/lambda_operations.yml
   workflow_dispatch:
