@@ -188,6 +188,6 @@ Resources:
 Outputs:
   OperationsSiteCloudFrontDistributionDomain:
     Value: !GetAtt OperationsSiteCloudFrontDistribution.DomainName
-    Description: CloudFront Domain Name
+    Description: Operations CloudFront Domain Name
     Export:
       Name: Operations-Site-CloudFrontDomainName

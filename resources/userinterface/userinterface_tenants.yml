@@ -173,6 +173,6 @@ Resources:
 Outputs:
   TenantsSiteCloudFrontDistributionDomain:
     Value: !GetAtt TenantsSiteCloudFrontDistribution.DomainName
-    Description: CloudFront Domain Name
+    Description: Tenants CloudFront Domain Name
     Export:
       Name: Tenants-Site-CloudFrontDomainName
