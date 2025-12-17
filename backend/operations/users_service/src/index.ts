@@ -1,5 +1,5 @@
 import express, { Request, Response }  from 'express'
-import serverlessExpress from '@codegenie/serverless-express'
+import serverlessExpress, { getCurrentInvoke } from '@codegenie/serverless-express'
 import logger from '@commons/logger'
 
 const app = express()
@@ -14,7 +14,10 @@ interface UserProfile {
 }
 
 app.get('/api/users/profile', (req: Request, res: Response) => {
+  const { event } = getCurrentInvoke()
+  const authz = event?.requestContext?.authorizer
   logger.info('GET /api/users/profile called')
+  logger.info(`Authorizer context: ${JSON.stringify(authz)}`)
   const users: UserProfile[] = [
     {
       id: '1',
