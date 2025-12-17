@@ -134,7 +134,7 @@ Resources:
             CachedMethods:
               - GET
               - HEAD
-            CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6 # CachingOptimized
+            CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad # CachingDisabled
             OriginRequestPolicyId: 59781a5b-3903-41f3-afcb-af62929ccde1 # CORS-CustomOrigin
             Compress: true
           - PathPattern: !Sub "/api/*"
