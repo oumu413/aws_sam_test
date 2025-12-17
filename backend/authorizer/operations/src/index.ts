@@ -11,7 +11,7 @@ type AuthContext = {
 
 
 // 環境変数からCognito設定を取得
-const region = process.env.OPERATIONS_USERS_USER_POOL_REGION
+const region = process.env.OPERATIONS_REGION
 const operationsUsersUserPoolId = process.env.OPERATIONS_USERS_USER_POOL
 const operationsUsersAppClientId = process.env.OPERATIONS_USERS_APP_CLIENT
 

@@ -66,4 +66,4 @@ jobs:
         working-directory: resources/userinterface
 
       #- name: Upload to S3
-      #  run: aws s3 sync frontend/operations/dist s3://dev-${{ secrets.APP_NAME }}-operations-site-bucket --delete  
+      #  run: aws s3 sync frontend/operations/dist s3://${{ secrets.APP_NAME }}-operations-site-bucket --delete  

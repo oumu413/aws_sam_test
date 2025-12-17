@@ -20,16 +20,16 @@ Resources:
     Properties:
       StageName: api
       Name: operations-http-api
-      CorsConfiguration:
-        AllowMethods:
-          - GET
-          - DELETE
-          - OPTIONS
-        AllowHeaders:
-          - Content-Type
-          - Authorization
-        AllowOrigins:
-          - "*"
+#      CorsConfiguration:
+#        AllowMethods:
+#          - GET
+#          - DELETE
+#          - OPTIONS
+#        AllowHeaders:
+#          - Content-Type
+#          - Authorization
+#        AllowOrigins:
+#          - "*"
       Auth:
         DefaultAuthorizer: OperationsLambdaAuthorizer
         Authorizers:
@@ -82,7 +82,7 @@ Resources:
       Timeout: 30
       Environment:
         Variables:
-          OPERATIONS_USERS_USER_POOL_REGION: !Ref "AWS::Region"
+          OPERATIONS_REGION: !Ref "AWS::Region"
           OPERATIONS_USERS_USER_POOL: !ImportValue Operations-UserPoolId
           OPERATIONS_USERS_APP_CLIENT: !ImportValue Operations-UserPoolClientId
 
@@ -93,7 +93,7 @@ Resources:
       RetentionInDays: 14
 
 ###################################################################################
-## 管理者サイト用 Users Service Lambda Function
+## 管理者サイト用 Operations Service Lambda Function
 ###################################################################################
   OperationsExecutionRole:
     Type: AWS::IAM::Role
