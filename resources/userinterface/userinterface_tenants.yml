@@ -91,7 +91,7 @@ Resources:
         Enabled: true
         Comment: !Sub tenants-site-distribution
         Aliases:
-          - !Sub "*.round-tenants.${DomainName}"
+          - !Sub "*.${DomainName}"
         PriceClass: PriceClass_200
         Origins:
           - Id: TenantsSiteOrigin
