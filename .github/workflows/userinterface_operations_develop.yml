@@ -45,8 +45,7 @@ jobs:
 
       ### SAM Deploy ###
       - name: SAM Build
-        run: sam build --template-file userinterface_operations.yml
-        working-directory: resources/userinterface
+        run: sam build -t resources/userinterface/userinterface_operations.yml
 
       - name: SAM Deploy
         run: |
