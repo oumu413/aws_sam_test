@@ -2,4 +2,4 @@ packages:
   - 'authorizer/*'
   - 'commons/*'
   - 'operations/*'
-  - 'user/*'
+  - 'tenants/*'

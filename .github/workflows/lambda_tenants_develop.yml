@@ -1,0 +1,75 @@
+
+name: Lambda Functions for Tenants Site (develop)
+
+on:
+  push:
+    branches:
+      - develop   # 開発環境
+    paths:
+    - backend/commons/auth_manager/**
+    - backend/commons/logger/**
+    - backend/authorizer/tenants/**
+    - backend/tenants/**
+    - resources/lambda/lambda_tenants.yml
+  workflow_dispatch:
+    
+permissions:
+  id-token: write
+  contents: read
+  
+jobs:
+  ####### Deploy(CD) #######
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 10.25.0
+
+      - name: Use Node.js 22.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+          cache-dependency-path: backend/pnpm-lock.yaml
+
+      - name: Install esbuild globally
+        run: npm install -g esbuild@0.25.12
+
+
+      ### Lambda Aurhorizer & Operations Build ###
+      - name: Install Lambda Operations Dependencies
+        run: pnpm install --frozen-lockfile
+        working-directory: backend
+
+      - name: Lambda Operations Build
+        run: pnpm run build
+        working-directory: backend
+
+      ### AWS Credentials ###
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN_DEV }}
+          aws-region: ${{ secrets.AWS_REGION_DEV }}
+
+      ### SAM Deploy ###
+      - name: SAM Build
+        run: sam build -t resources/lambda/lambda_operations.yml
+
+      - name: SAM Deploy
+        run: |
+          sam deploy \
+            --template-file .aws-sam/build/template.yaml \
+            --stack-name operations-lambda \
+            --resolve-s3 \
+            --parameter-overrides \
+              Env=dev \
+            --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM \
+            --no-confirm-changeset \
+            --no-fail-on-empty-changeset \
+            --force-upload

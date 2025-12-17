@@ -9,7 +9,6 @@
     "tsc": "tsc"
   },
   "dependencies": {
-    "@aws-lambda-powertools/logger": "^2.29.0",
     "@codegenie/serverless-express": "4.15.0",
     "@commons/logger": "workspace:*",
     "@commons/auth_manager": "workspace:*",
