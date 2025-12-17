@@ -59,16 +59,16 @@ Resources:
               - sts:AssumeRole
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-#      Policies:
-#        - PolicyName: tenants-authorizer-execution-policy
-#          PolicyDocument:
-#            Version: 2012-10-17
-#            Statement:
-#              - Effect: Allow
-#                Action:
-#                  - cognito-idp:List*
-#                Resource: 
-#                  - "*"
+      Policies:
+        - PolicyName: tenants-authorizer-execution-policy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - cognito-idp:List*
+                Resource: 
+                  - "*"
 
   TenantsAuthorizerFunction:
     Type: AWS::Serverless::Function
