@@ -1,0 +1,68 @@
+
+name: Userinterface for Tenants Site (develop)
+
+on:
+  push:
+    branches:
+      - develop   # 開発環境
+    paths:
+    - frontend/tenants/**
+    - resources/userinterface/userinterface_tenants.yml
+  workflow_dispatch:
+    
+permissions:
+  id-token: write
+  contents: read
+  
+jobs:
+  ####### Deploy(CD) #######
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      
+      - name: Use Node.js 22.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      ### Frontend Build ###
+      - name: Install Dependencies
+        run: npm install --frozen-lockfile
+        working-directory: frontend/tenants
+
+      - name: Frontend Build
+        run: npm run build
+        working-directory: frontend/tenants
+        
+      ### AWS Credentials ###
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN_DEV }}
+          aws-region: ${{ secrets.AWS_REGION_DEV }}
+
+      ### SAM Deploy ###
+      - name: SAM Build
+        run: sam build --template-file userinterface_tenants.yml
+        working-directory: resources/userinterface
+
+      - name: SAM Deploy
+        run: |
+          sam deploy \
+            --template-file .aws-sam/build/template.yaml \
+            --stack-name tenants-userinterface \
+            --resolve-s3 \
+            --parameter-overrides \
+              Env=dev \
+              AppName=${{ secrets.APP_NAME }} \
+              DomainName=${{ secrets.DOMAIN_NAME_DEV }} \
+              CertificateArn=${{ secrets.ACM_CERTIFICATE_ARN }} \
+            --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM \
+            --no-confirm-changeset \
+            --no-fail-on-empty-changeset
+
+      #- name: Upload to S3
+      #  run: aws s3 sync frontend/tenants/dist s3://${{ secrets.APP_NAME }}-tenants-site-bucket --delete

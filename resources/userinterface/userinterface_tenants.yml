@@ -1,0 +1,178 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+
+Description: "User Interface Resources for Tenants Site"
+
+Parameters:
+  AppName:
+    Type: String
+  DomainName:
+    Type: String
+  CertificateArn:
+    Type: String
+  Env:
+    Type: String
+
+Resources:
+#  TenantsSiteCloudFrontDistributionLogBucket:
+#    Type: AWS::S3::Bucket
+#    Properties:
+#      BucketName: !Sub ${AppName}-tenants-site-cf-log-bucket
+#      OwnershipControls:
+#        Rules:
+#        - ObjectOwnership: BucketOwnerPreferred
+#      #AccessControl: LogDeliveryWrite
+#      PublicAccessBlockConfiguration:
+#        BlockPublicAcls: true
+#        BlockPublicPolicy: true
+#        IgnorePublicAcls: true
+#        RestrictPublicBuckets: true
+#      LifecycleConfiguration:
+#        Rules:
+#          - Id: AutoDelete
+#            Status: Enabled
+#            ExpirationInDays: 15
+
+##################################################################################
+## 管理者サイト用 S3バケット
+##################################################################################
+  TenantsSiteBucket:
+    Type: AWS::S3::Bucket
+    #DeletionPolicy: Retain
+    Properties:
+      BucketName: !Sub ${AppName}-tenants-site-bucket
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  TenantsSiteBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    DependsOn: TenantsSiteBucket
+    Properties:
+      Bucket: !Ref TenantsSiteBucket
+      PolicyDocument:
+        Statement:
+          - Action: s3:GetObject
+            Effect: Allow
+            Resource: !Sub arn:aws:s3:::${TenantsSiteBucket}/*
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/${TenantsSiteCloudFrontDistribution}
+
+
+###################################################################################
+## 管理者サイト用 CloudFront ディストリビューション
+###################################################################################
+  OACTenantsSite:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Description: tenants-site-oac
+        Name: tenants-site-oac
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+
+  TenantsSiteCloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    DependsOn:
+      - TenantsSiteBucket
+      - OACTenantsSite
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        Comment: !Sub tenants-site-distribution
+        Aliases:
+          - !Sub "*.round-tenants.${DomainName}"
+        PriceClass: PriceClass_200
+        Origins:
+          - Id: TenantsSiteOrigin
+            DomainName: !Sub ${TenantsSiteBucket}.s3.amazonaws.com
+            OriginAccessControlId: !GetAtt OACTenantsSite.Id
+            S3OriginConfig: {}
+          - Id: ApiGatewayOrigin
+            DomainName: !Sub 
+              - "${TenantsHttpApiId}.execute-api.${AWS::Region}.amazonaws.com"
+              - { TenantsHttpApiId: !ImportValue Tenants-HttpApiId }
+            CustomOriginConfig:
+              OriginProtocolPolicy: https-only
+              OriginSSLProtocols:
+                - TLSv1.2
+#        Logging:
+#          IncludeCookies: false
+#          Bucket: !Sub ${TenantsSiteCloudFrontDistributionLogBucket}.s3.${AWS::Region}.amazonaws.com
+        DefaultRootObject: index.html
+        DefaultCacheBehavior:
+          TargetOriginId: TenantsSiteOrigin
+          ViewerProtocolPolicy: redirect-to-https
+          AllowedMethods:
+            - HEAD
+            - GET
+          CachedMethods:
+            - HEAD
+            - GET
+          #CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6 # CachingOptimized
+          CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad # CachingDisabled
+          OriginRequestPolicyId: 59781a5b-3903-41f3-afcb-af62929ccde1 # CORS-CustomOrigin
+          Compress: true
+        CacheBehaviors:
+          - PathPattern: "/assets/*"
+            TargetOriginId: TenantsSiteOrigin
+            ViewerProtocolPolicy: redirect-to-https
+            AllowedMethods:
+              - GET
+              - HEAD
+            CachedMethods:
+              - GET
+              - HEAD
+            CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad # CachingDisabled
+            OriginRequestPolicyId: 59781a5b-3903-41f3-afcb-af62929ccde1 # CORS-CustomOrigin
+            Compress: true
+          - PathPattern: !Sub "/api/*"
+            TargetOriginId: ApiGatewayOrigin
+            ViewerProtocolPolicy: redirect-to-https
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+              - PUT
+              - POST
+              - PATCH
+              - DELETE
+            CachedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+            Compress: true
+            CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad # CachingDisabled
+            OriginRequestPolicyId: b689b0a8-53d0-40ab-baf2-68738e2966ac # AllViewerExceptHostHeader　カスタムポリシーにするか検討
+        CustomErrorResponses:
+          - ErrorCachingMinTTL: 0
+            ErrorCode: 403
+            ResponseCode: 403
+            ResponsePagePath: /index.html
+          - ErrorCachingMinTTL: 0
+            ErrorCode: 404
+            ResponseCode: 404
+            ResponsePagePath: /index.html
+        ViewerCertificate:
+          AcmCertificateArn: !Ref CertificateArn
+          SslSupportMethod: sni-only
+          MinimumProtocolVersion: TLSv1.2_2021
+        IPV6Enabled: false
+        HttpVersion: http2
+
+Outputs:
+  TenantsSiteCloudFrontDistributionDomain:
+    Value: !GetAtt TenantsSiteCloudFrontDistribution.DomainName
+    Description: CloudFront Domain Name
+    Export:
+      Name: Tenants-Site-CloudFrontDomainName
