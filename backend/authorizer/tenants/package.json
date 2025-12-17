@@ -1,5 +1,5 @@
 {
-  "name": "@authorizer/operations",
+  "name": "@authorizer/tenants",
   "version": "1.0.0",
   "description": "Lambda Authorizer Function",
   "type": "module",

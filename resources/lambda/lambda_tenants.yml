@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Lambda Functions for Operations Site
+Description: Lambda Functions for Tenants Site
 
 Globals:
   Function:
@@ -13,13 +13,13 @@ Globals:
 
 Resources:
 ###################################################################################
-## 管理者サイト用 API Gateway(HTTP API) ＆ Lambda Authorizer
+## テナントサイト用 API Gateway(HTTP API) ＆ Lambda Authorizer
 ###################################################################################
-  OperationsHttpApi:
+  TenantsHttpApi:
     Type: AWS::Serverless::HttpApi
     Properties:
       StageName: api
-      Name: operations-http-api
+      Name: tenants-http-api
 #      CorsConfiguration:
 #        AllowMethods:
 #          - GET
@@ -31,11 +31,11 @@ Resources:
 #        AllowOrigins:
 #          - "*"
       Auth:
-        DefaultAuthorizer: OperationsLambdaAuthorizer
+        DefaultAuthorizer: TenantsLambdaAuthorizer
         Authorizers:
-          OperationsLambdaAuthorizer:
+          TenantsLambdaAuthorizer:
             AuthorizerPayloadFormatVersion: 2.0
-            FunctionArn: !GetAtt OperationsAuthorizerFunction.Arn
+            FunctionArn: !GetAtt TenantsAuthorizerFunction.Arn
             EnableSimpleResponses: true
             EnableFunctionDefaultPermissions: true
             Identity:
@@ -43,10 +43,10 @@ Resources:
                 - Authorization
               ReauthorizeEvery: 900 # 15分キャッシュ
 
-  OperationsAuthorizerExecutionRole:
+  TenantsAuthorizerExecutionRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: operations-authorizer-execution-role
+      RoleName: tenants-authorizer-execution-role
       Path: '/'
       AssumeRolePolicyDocument:
         Version: 2012-10-17
@@ -60,45 +60,41 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
       Policies:
-        - PolicyName: operations-authorizer-execution-policy
+        - PolicyName: tenants-authorizer-execution-policy
           PolicyDocument:
             Version: 2012-10-17
             Statement:
               - Effect: Allow
                 Action:
                   - cognito-idp:List*
-                Resource: !Sub
-                  - arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${OperationsUsersUserPool}
-                  - { OperationsUsersUserPool: !ImportValue Operations-UserPoolId }
+                Resource: arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/*
 
-  OperationsAuthorizerFunction:
+  TenantsAuthorizerFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: operations-authorizer-function
-      CodeUri: ../../backend/authorizer/operations/dist
+      FunctionName: tenants-authorizer-function
+      CodeUri: ../../backend/authorizer/tenants/dist
       Handler: index.handler
-      Role: !GetAtt OperationsAuthorizerExecutionRole.Arn
+      Role: !GetAtt TenantsAuthorizerExecutionRole.Arn
       MemorySize: 256
       Timeout: 30
       Environment:
         Variables:
-          OPERATIONS_REGION: !Ref "AWS::Region"
-          OPERATIONS_USERS_USER_POOL: !ImportValue Operations-UserPoolId
-          OPERATIONS_USERS_APP_CLIENT: !ImportValue Operations-UserPoolClientId
+          TENANTS_REGION: !Ref "AWS::Region"
 
-  OperationsAuthorizerFunctionLogGroup:
+  TenantsAuthorizerFunctionLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: !Sub /aws/lambda/${OperationsAuthorizerFunction}
+      LogGroupName: !Sub /aws/lambda/${TenantsAuthorizerFunction}
       RetentionInDays: 14
 
 ###################################################################################
-## 管理者サイト用 Operations Service Lambda Function
+## テナントサイト用 Tenants Service Lambda Function
 ###################################################################################
-  OperationsExecutionRole:
+  TenantsExecutionRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: operations-execution-role
+      RoleName: tenants-execution-role
       Path: '/'
       AssumeRolePolicyDocument:
         Version: 2012-10-17
@@ -112,42 +108,40 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
 #      Policies:
-#        - PolicyName: operations-execution-policy
+#        - PolicyName: tenants-execution-policy
 #          PolicyDocument:
 #            Version: 2012-10-17
 #            Statement:
 #              - Effect: Allow
 #                Action:
 #                  - cognito-idp:List*
-#                Resource: !Sub
-#                  - arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${OperationsUserPool}
-#                  - { OperationsUserPool: !ImportValue Operations-UserPoolId }
+#                Resource: arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/*
 
-  OperationsUsersFunction:
+  TenantsUsersFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: operations-users-function
-      CodeUri: ../../backend/operations/users_service/dist
+      FunctionName: tenants-users-function
+      CodeUri: ../../backend/tenants/users_service/dist
       Handler: index.handler
-      Role: !GetAtt OperationsExecutionRole.Arn
+      Role: !GetAtt TenantsExecutionRole.Arn
       Events:
         HttpApiEvent:
           Type: HttpApi
           Properties:
-            ApiId: !Ref OperationsHttpApi
+            ApiId: !Ref TenantsHttpApi
             Path: /users/{proxy+}
             Method: ANY
             PayloadFormatVersion: "2.0"
-  
-  OperationsUsersFunctionLogGroup:
+
+  TenantsUsersFunctionLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: !Sub /aws/lambda/${OperationsUsersFunction}
+      LogGroupName: !Sub /aws/lambda/${TenantsUsersFunction}
       RetentionInDays: 14
 
 Outputs:
-  OperationsHttpApiId:
-    Value: !Ref OperationsHttpApi
-    Description: Operations HTTP API ID
+  TenantsHttpApiId:
+    Value: !Ref TenantsHttpApi
+    Description: Tenants HTTP API ID
     Export:
-      Name: Operations-HttpApiId
+      Name: Tenants-HttpApiId
