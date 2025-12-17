@@ -67,7 +67,8 @@ Resources:
               - Effect: Allow
                 Action:
                   - cognito-idp:List*
-                Resource: "*"
+                Resource: 
+                  - "*"
 
   TenantsAuthorizerFunction:
     Type: AWS::Serverless::Function
