@@ -51,7 +51,7 @@ jobs:
       - name: SAM Deploy
         run: |
           sam deploy \
-            --template-file userinterface_operations.yml \
+            --template-file .aws-sam/build/template.yaml \
             --stack-name operations-userinterface \
             --resolve-s3 \
             --parameter-overrides \
@@ -63,7 +63,6 @@ jobs:
             --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM \
             --no-confirm-changeset \
             --no-fail-on-empty-changeset
-        working-directory: resources/userinterface
 
       #- name: Upload to S3
       #  run: aws s3 sync frontend/operations/dist s3://${{ secrets.APP_NAME }}-operations-site-bucket --delete  
