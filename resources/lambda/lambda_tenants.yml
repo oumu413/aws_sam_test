@@ -67,7 +67,8 @@ Resources:
               - Effect: Allow
                 Action:
                   - cognito-idp:List*
-                Resource: !Sub arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/*
+                Resource: 
+                  - !Sub arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/*
 
   TenantsAuthorizerFunction:
     Type: AWS::Serverless::Function
