@@ -10,17 +10,16 @@ Resources:
     Type: "AWS::Cognito::UserPool"
     Properties:
       UserPoolName: operations-user-pool
-#      AutoVerifiedAttributes:
-#        - "email"
       UsernameConfiguration:
-        CaseSensitive: true
+        CaseSensitive: true # ユーザー名の大文字小文字を区別
       AccountRecoverySetting:
         RecoveryMechanisms:
-          - Name: admin_only
+          - Name: admin_only # 管理者のみパスワードリセット可能
             Priority: 1
-      AdminCreateUserConfig:      
+      AdminCreateUserConfig:
+        AllowAdminCreateUserOnly: true # 管理者のみユーザー作成可能
         InviteMessageTemplate:
-          EmailMessage: !Join           
+          EmailMessage: !Join
             - ""
             - - "Login into operations UI application at "
               - "<br>"
@@ -59,25 +58,12 @@ Resources:
     Properties:
       ClientName: operations-pool-client
       UserPoolId: !Ref CognitoOperationsUserPool
-      GenerateSecret: false
+      GenerateSecret: false # シークレット不要
       ExplicitAuthFlows:
         - "ALLOW_USER_PASSWORD_AUTH"
         - "ALLOW_REFRESH_TOKEN_AUTH"
         - "ALLOW_USER_SRP_AUTH"
-      PreventUserExistenceErrors: ENABLED
-#      AllowedOAuthFlowsUserPoolClient: true
-#      AllowedOAuthFlows:
-#        - code
-#      SupportedIdentityProviders:
-#        - COGNITO
-#      CallbackURLs:
-#        - !Join ["",["https://round-operations.", !Ref DomainName, "/"]]
-#      LogoutURLs:  
-#        - !Join ["",["https://round-operations.", !Ref DomainName, "/"]]
-#      AllowedOAuthScopes:
-#        - email
-#        - openid
-#        - profile
+      PreventUserExistenceErrors: ENABLED # ユーザーが存在しない場合、エラーメッセージを曖昧
       ReadAttributes:
         - "custom:userRole"
 
