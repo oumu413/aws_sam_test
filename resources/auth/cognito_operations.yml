@@ -10,11 +10,13 @@ Resources:
     Type: "AWS::Cognito::UserPool"
     Properties:
       UserPoolName: !Sub operations-user-pool
-      AutoVerifiedAttributes:
-        - "email"
+#      AutoVerifiedAttributes:
+#        - "email"
+      UsernameConfiguration:
+        CaseSensitive: true
       AccountRecoverySetting:
         RecoveryMechanisms:
-          - Name: verified_email
+          - Name: admin_only
             Priority: 1
       AdminCreateUserConfig:      
         InviteMessageTemplate:
@@ -39,10 +41,8 @@ Resources:
           Required: true
           Mutable: true
         - AttributeDataType: "String"
-          Name: tenantId
-        - AttributeDataType: "String"
           Name: userRole
-          Required: false
+          Required: true
           Mutable: true
       MfaConfiguration: "OPTIONAL"
       EnabledMfas: 
@@ -58,7 +58,7 @@ Resources:
   CognitoOperationsUserPoolClient:
     Type: "AWS::Cognito::UserPoolClient"
     Properties:
-      ClientName: !Sub operations-pool-client
+      ClientName: operations-pool-client
       UserPoolId: !Ref CognitoOperationsUserPool
       GenerateSecret: false
       ExplicitAuthFlows:
@@ -67,14 +67,14 @@ Resources:
         - "ALLOW_USER_SRP_AUTH"
       PreventUserExistenceErrors: ENABLED
       AllowedOAuthFlowsUserPoolClient: true
-      AllowedOAuthFlows:
-        - code
-      SupportedIdentityProviders:
-        - COGNITO
-      CallbackURLs:
-        - !Join ["",["https://round-operations.", !Ref DomainName, "/"]]
-      LogoutURLs:  
-        - !Join ["",["https://round-operations.", !Ref DomainName, "/"]]
+#      AllowedOAuthFlows:
+#        - code
+#      SupportedIdentityProviders:
+#        - COGNITO
+#      CallbackURLs:
+#        - !Join ["",["https://round-operations.", !Ref DomainName, "/"]]
+#      LogoutURLs:  
+#        - !Join ["",["https://round-operations.", !Ref DomainName, "/"]]
       AllowedOAuthScopes:
         - email
         - openid
