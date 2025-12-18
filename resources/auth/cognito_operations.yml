@@ -9,7 +9,7 @@ Resources:
   CognitoOperationsUserPool:
     Type: "AWS::Cognito::UserPool"
     Properties:
-      UserPoolName: !Sub operations-user-pool
+      UserPoolName: operations-user-pool
 #      AutoVerifiedAttributes:
 #        - "email"
       UsernameConfiguration:
@@ -42,7 +42,6 @@ Resources:
           Mutable: true
         - AttributeDataType: "String"
           Name: userRole
-          Required: true
           Mutable: true
       MfaConfiguration: "OPTIONAL"
       EnabledMfas: 
@@ -81,18 +80,6 @@ Resources:
         - profile
       ReadAttributes:
         - "custom:userRole"
-
-#      WriteAttributes:
-#        - "email"
-#        - "custom:userRole"
-
-#  CognitoOperationsGroup:
-#    Type: AWS::Cognito::UserPoolGroup
-#    Properties:
-#      GroupName: SystemAdmins
-#      Description: Admin user group
-#      Precedence: 0
-#      UserPoolId: !Ref CognitoOperationsUserPool
 
 Outputs:
   CognitoOperationsUserPoolId:
