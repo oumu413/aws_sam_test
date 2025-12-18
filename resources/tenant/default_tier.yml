@@ -1,0 +1,112 @@
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: "User Interface Resources for Operations Site"
+
+Parameters:
+  Env:
+    Type: String
+  DomainName:
+    Type: String
+  HostedZoneId:
+    Type: String
+  TenantName:
+    Type: String
+
+Resources:
+################################################################################
+## テナントサイト用 Route53 レコードセット
+################################################################################
+  Route53TenantsSiteRecordSet:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref HostedZoneId
+      Name: !Sub ${TenantName}.${DomainName}
+      Type: A
+      AliasTarget:
+        HostedZoneId: Z2FDTNDATAQYW2 #　CloudFront Hosted Zone ID (固定値)
+        DNSName: !ImportValue Tenants-Site-CloudFrontDomainName
+
+################################################################################
+## テナントサイト用 Cognito
+################################################################################
+  CognitoTenantsUserPool:
+    Type: "AWS::Cognito::UserPool"
+    Properties:
+      UserPoolName: !Sub ${TenantName}-user-pool
+      UsernameConfiguration:
+        CaseSensitive: true # ユーザー名の大文字小文字を区別
+      AccountRecoverySetting:
+        RecoveryMechanisms:
+          - Name: admin_only # 管理者のみパスワードリセット可能
+            Priority: 1
+      Schema:
+        - AttributeDataType: "String"
+          Name: email
+          Required: false
+          Mutable: true
+        - AttributeDataType: "String"
+          Name: tenantId
+          Required: false
+          Mutable: false
+        - AttributeDataType: "String"
+          Name: userRole
+          Required: false
+          Mutable: false
+      MfaConfiguration: "OPTIONAL"
+      EnabledMfas: 
+        - SOFTWARE_TOKEN_MFA #TOTPを有効化
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireUppercase: true
+          RequireLowercase: true
+          RequireNumbers: true
+          RequireSymbols: true
+
+  CognitoTenantsUserPoolClient:
+    Type: "AWS::Cognito::UserPoolClient"
+    Properties:
+      ClientName: !Sub ${TenantName}-pool-client
+      UserPoolId: !Ref CognitoTenantsUserPool
+      GenerateSecret: false # シークレット不要
+      ExplicitAuthFlows:
+        - "ALLOW_USER_PASSWORD_AUTH"
+        - "ALLOW_REFRESH_TOKEN_AUTH"
+        - "ALLOW_USER_SRP_AUTH"
+      PreventUserExistenceErrors: ENABLED # ユーザーが存在しない場合、エラーメッセージを曖昧
+      ReadAttributes:
+        - "custom:tenantId"
+        - "custom:userRole"
+
+  CognitoTenantsAdminGroup:
+    Type: AWS::Cognito::UserPoolGroup
+    Properties:
+      GroupName: admin
+      Description: Admin user group
+      Precedence: 0
+      UserPoolId: !Ref CognitoTenantsUserPool
+
+  CognitoTenantsSubAdminGroup:
+    Type: AWS::Cognito::UserPoolGroup
+    Properties:
+      GroupName: subadmin
+      Description: SubAdmin user group
+      Precedence: 1
+      UserPoolId: !Ref CognitoTenantsUserPool
+
+  CognitoTenantsTeacherGroup:
+    Type: AWS::Cognito::UserPoolGroup
+    Properties:
+      GroupName: teacher
+      Description: Teacher user group
+      Precedence: 2
+      UserPoolId: !Ref CognitoTenantsUserPool
+
+  CognitoTenantsStudentGroup:
+    Type: AWS::Cognito::UserPoolGroup
+    Properties:
+      GroupName: student
+      Description: Student user group
+      Precedence: 3
+      UserPoolId: !Ref CognitoTenantsUserPool
+

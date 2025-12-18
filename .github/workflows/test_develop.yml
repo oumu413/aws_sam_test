@@ -1,0 +1,52 @@
+
+name: Test (develop)
+
+on:
+  push:
+    branches:
+      - develop   # 開発環境
+    paths:
+    - resources/tenant/default_tier.yml
+  workflow_dispatch:
+    
+permissions:
+  id-token: write
+  contents: read
+  
+jobs:
+  ####### Deploy(CD) #######
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 22.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      ### AWS Credentials ###
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN_DEV }}
+          aws-region: ${{ secrets.AWS_REGION_DEV }}
+
+      ### SAM Deploy ###
+      - name: SAM Build
+        run: sam build -t resources/tenant/default_tier.yml
+
+      - name: SAM Deploy
+        run: |
+          sam deploy \
+            --template-file .aws-sam/build/template.yaml \
+            --stack-name test-tenant-default_tier \
+            --resolve-s3 \
+            --parameter-overrides \
+              Env=dev \
+              DomainName=${{ secrets.DOMAIN_NAME_DEV }} \
+              HostedZoneId=${{ secrets.HOSTED_ZONE_ID }} \
+            --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM \
+            --no-confirm-changeset \
+            --no-fail-on-empty-changeset
