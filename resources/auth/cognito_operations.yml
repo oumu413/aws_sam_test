@@ -65,7 +65,7 @@ Resources:
         - "ALLOW_REFRESH_TOKEN_AUTH"
         - "ALLOW_USER_SRP_AUTH"
       PreventUserExistenceErrors: ENABLED
-      AllowedOAuthFlowsUserPoolClient: true
+#      AllowedOAuthFlowsUserPoolClient: true
 #      AllowedOAuthFlows:
 #        - code
 #      SupportedIdentityProviders:
