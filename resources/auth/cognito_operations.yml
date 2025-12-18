@@ -74,10 +74,10 @@ Resources:
 #        - !Join ["",["https://round-operations.", !Ref DomainName, "/"]]
 #      LogoutURLs:  
 #        - !Join ["",["https://round-operations.", !Ref DomainName, "/"]]
-      AllowedOAuthScopes:
-        - email
-        - openid
-        - profile
+#      AllowedOAuthScopes:
+#        - email
+#        - openid
+#        - profile
       ReadAttributes:
         - "custom:userRole"
 
