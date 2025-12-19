@@ -81,11 +81,10 @@ function extractSubdomain(hostOrDomain?: string, baseDomain?: string): string {
 function withCognitoFromSubdomain(baseDomain?: string) {
   return (req: Request, res: Response, next: NextFunction) => {
     const { event } = getCurrentInvoke()
-    const domainFromEvent = event?.requestContext?.domainName // HTTP API の実行ドメイン
     const hostFromHeader = req.headers.host
 
     // event優先、なければヘッダ
-    const host = (domainFromEvent || hostFromHeader || '').toString()
+    const host = (hostFromHeader || '').toString()
     const sub = extractSubdomain(host, baseDomain)
 
     logger.info(`Host=${host}, extracted subdomain=${sub}`)
