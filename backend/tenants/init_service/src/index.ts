@@ -22,8 +22,8 @@ type CognitoConfig = {
 
 const COGNITO_BY_SUBDOMAIN: Record<string, CognitoConfig> = {
   'test': {
-    userPoolId: 'ap-northeast-3_MZgLMknuQ',
-    userPoolClientId: '4tfv7a892isat8sjt06v74ijhb',
+    userPoolId: 'ap-northeast-3_hpRExMCHH',
+    userPoolClientId: 'jkq73dtivqbokqe45asr7fl25',
   },
   'tenant-b': {
     userPoolId: 'xxxxxxxxxxxxxxxxxxxxxxxx',
@@ -81,7 +81,7 @@ function extractSubdomain(hostOrDomain?: string, baseDomain?: string): string {
 
 function withCognitoFromSubdomain(baseDomain?: string) {
   return (req: Request, res: Response, next: NextFunction) => {
-    const originHost = req.headers?.['x-forwarded-host']
+    const originHost = req.headers?.['x-forwarded-host'] // cloudfront functionで追加するヘッダー
 
     // event優先、なければヘッダ
     const host = (originHost || '').toString()
