@@ -38,6 +38,7 @@ function withAuthzLog() {
     const authz = event?.requestContext?.authorizer
     logger.info(`${req.method} ${req.originalUrl} called`)
     logger.info(`Authorizer context: ${JSON.stringify(authz)}`)
+    logger.info(`Headers: ${JSON.stringify(req.headers, null, 2)}`)
     next()
   }
 }
