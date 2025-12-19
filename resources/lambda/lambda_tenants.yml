@@ -4,7 +4,7 @@ Description: Lambda Functions for Tenants Site
 
 Globals:
   Function:
-    Runtime: nodejs24.x
+    Runtime: nodejs22.x
     MemorySize: 256
     Timeout: 30
     Environment:
