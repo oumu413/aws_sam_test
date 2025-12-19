@@ -117,7 +117,7 @@ Resources:
         CookiesConfig:
           CookieBehavior: none
         QueryStringsConfig:
-          QueryStringBehavior: non
+          QueryStringBehavior: none
 
   TenantsSiteCloudFrontDistribution:
     Type: AWS::CloudFront::Distribution
