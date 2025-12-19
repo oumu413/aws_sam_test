@@ -134,7 +134,7 @@ Resources:
             Method: GET
             PayloadFormatVersion: "2.0"
           Auth:
-            Authorizer: NONE
+            Authorizer: "NONE"
   
   TenantsInitFunctionLogGroup:
     Type: AWS::Logs::LogGroup
