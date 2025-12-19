@@ -10,7 +10,7 @@ type AuthContext = {
 }
 
 // 環境変数からCognito設定を取得
-const region = process.env.OPERATIONS_REGION
+const region = process.env.TENANTS_REGION
 
 // 実行時チェック
 if (!region) {
