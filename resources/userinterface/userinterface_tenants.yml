@@ -81,6 +81,30 @@ Resources:
         SigningBehavior: always
         SigningProtocol: sigv4
 
+  
+  AddOriginHostFunction:
+      Type: AWS::CloudFront::Function
+      Properties:
+        Name: add-origin-host
+        AutoPublish: true # LIVE に自動公開（Association 可能にする）
+        FunctionConfig:
+          Comment: 'Copy viewer Host to Origin-Host on viewer-request'
+          Runtime: cloudfront-js-1.0
+        FunctionCode: |
+          function handler(event) {
+            var req = event.request;
+            var headers = req.headers || {};
+            // viewer の Host を取得
+            var viewerHost = headers['host'] ? headers['host'].value : '';
+            if (viewerHost) {
+              // API Gateway に転送するため別名ヘッダに保存
+              headers['origin-host'] = { value: viewerHost };
+              req.headers = headers;
+            }
+            return req; // オリジンへ進める
+          }
+
+
   TenantsSiteCloudFrontDistribution:
     Type: AWS::CloudFront::Distribution
     DependsOn:
@@ -154,6 +178,9 @@ Resources:
             Compress: true
             CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad # CachingDisabled
             OriginRequestPolicyId: b689b0a8-53d0-40ab-baf2-68738e2966ac # AllViewerExceptHostHeader　カスタムポリシーにするか検討
+            FunctionAssociations:
+              - EventType: viewer-request
+                FunctionARN: !GetAtt AddOriginHostFunction.FunctionMetadata.FunctionARN
         CustomErrorResponses:
           - ErrorCachingMinTTL: 0
             ErrorCode: 403

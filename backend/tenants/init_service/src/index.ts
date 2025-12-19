@@ -38,7 +38,6 @@ function withAuthzLog() {
     const authz = event?.requestContext?.authorizer
     logger.info(`${req.method} ${req.originalUrl} called`)
     logger.info(`Authorizer context: ${JSON.stringify(authz)}`)
-    logger.info(`Headers: ${JSON.stringify(req.headers, null, 2)}`)
     next()
   }
 }
@@ -82,10 +81,9 @@ function extractSubdomain(hostOrDomain?: string, baseDomain?: string): string {
 function withCognitoFromSubdomain(baseDomain?: string) {
   return (req: Request, res: Response, next: NextFunction) => {
     const { event } = getCurrentInvoke()
-    const hostFromHeader = req.headers.host
+    const originHost = req.headers['Origin-Host'] // cloudfront functionにて追加
 
-    // event優先、なければヘッダ
-    const host = (hostFromHeader || '').toString()
+    const host = (originHost || '').toString()
     const sub = extractSubdomain(host, baseDomain)
 
     logger.info(`Host=${host}, extracted subdomain=${sub}`)
