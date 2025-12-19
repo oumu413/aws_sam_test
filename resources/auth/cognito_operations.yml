@@ -39,9 +39,6 @@ Resources:
           Name: email
           Required: true
           Mutable: true
-        - AttributeDataType: "String"
-          Name: userRole
-          Mutable: true
       MfaConfiguration: "OPTIONAL"
       EnabledMfas: 
         - SOFTWARE_TOKEN_MFA #TOTPを有効化
@@ -66,6 +63,22 @@ Resources:
       PreventUserExistenceErrors: ENABLED # ユーザーが存在しない場合、エラーメッセージを曖昧
       ReadAttributes:
         - "custom:userRole"
+
+  CognitoOperationsAdminGroup:
+    Type: AWS::Cognito::UserPoolGroup
+    Properties:
+      GroupName: OperationAdmin
+      Description: Operations Admin group
+      Precedence: 0
+      UserPoolId: !Ref CognitoOperationsUserPool
+
+  CognitoOperationsViewerGroup:
+    Type: AWS::Cognito::UserPoolGroup
+    Properties:
+      GroupName: OperationViewer
+      Description: Operations Viewer group
+      Precedence: 1
+      UserPoolId: !Ref CognitoOperationsUserPool
 
 Outputs:
   CognitoOperationsUserPoolId:

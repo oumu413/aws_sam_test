@@ -4,7 +4,7 @@ Description: Lambda Functions for Operations Site
 
 Globals:
   Function:
-    Runtime: nodejs22.x
+    Runtime: nodejs24.x
     MemorySize: 256
     Timeout: 30
     Environment:
@@ -79,7 +79,7 @@ Resources:
       Handler: index.handler
       Role: !GetAtt OperationsAuthorizerExecutionRole.Arn
       MemorySize: 256
-      Timeout: 30
+      Timeout: 5
       Environment:
         Variables:
           OPERATIONS_REGION: !Ref "AWS::Region"

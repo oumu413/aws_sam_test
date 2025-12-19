@@ -4,7 +4,7 @@ Description: Lambda Functions for Tenants Site
 
 Globals:
   Function:
-    Runtime: nodejs22.x
+    Runtime: nodejs24.x
     MemorySize: 256
     Timeout: 30
     Environment:
@@ -78,7 +78,7 @@ Resources:
       Handler: index.handler
       Role: !GetAtt TenantsAuthorizerExecutionRole.Arn
       MemorySize: 256
-      Timeout: 30
+      Timeout: 5
       Environment:
         Variables:
           TENANTS_REGION: !Ref "AWS::Region"
@@ -117,6 +117,28 @@ Resources:
 #                Action:
 #                  - cognito-idp:List*
 #                Resource: arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/*
+
+  TenantsInitFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: tenants-init-function
+      CodeUri: ../../backend/tenants/init_service/dist
+      Handler: index.handler
+      Role: !GetAtt TenantsExecutionRole.Arn
+      Events:
+        HttpApiEvent:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref TenantsHttpApi
+            Path: /tenant/init
+            Method: GET
+            PayloadFormatVersion: "2.0"
+  
+  TenantsInitFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${TenantsInitFunction}
+      RetentionInDays: 14
 
   TenantsUsersFunction:
     Type: AWS::Serverless::Function

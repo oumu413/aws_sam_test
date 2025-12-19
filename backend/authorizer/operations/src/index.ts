@@ -1,11 +1,11 @@
 import { APIGatewayRequestAuthorizerEventV2, APIGatewaySimpleAuthorizerWithContextResult } from 'aws-lambda'
 import { jwtVerify, createRemoteJWKSet, JWTPayload } from "jose"
 import  logger  from "@commons/logger"
-import authManager, { UserRoles } from "@commons/auth_manager"
+import authManager, { UserGroups } from "@commons/auth_manager"
 
 type AuthContext = {
   userName?: string
-  userRole?: string
+  userGroup?: string
   reason?: string
 }
 
@@ -23,8 +23,6 @@ if (!region || !operationsUsersUserPoolId || !operationsUsersAppClientId) {
 export const handler = async (
   event: APIGatewayRequestAuthorizerEventV2
 ): Promise<APIGatewaySimpleAuthorizerWithContextResult<AuthContext>> => {
-  const routeKey = event.routeKey // 例: "POST /tenant"
-  logger.info(`Route Key: ${routeKey}`)
 
   const authHeader = event.headers?.authorization || event.headers?.Authorization
   const authResponse:APIGatewaySimpleAuthorizerWithContextResult<AuthContext> = {
@@ -45,26 +43,34 @@ export const handler = async (
   const claims = await validateJWT(token)
   if (!claims) {
     authResponse.context = { reason: "Unauthorized" }
-    logger.error('JWT validation failed')
     return authResponse
   }
 
   logger.info(`JWT verified successfully: ${JSON.stringify(claims)}`)
 
   const userName = claims["cognito:username"] as string
-  const userRole = claims["custom:userRole"] as UserRoles
+  const userGroups = claims["cognito:groups"] as UserGroups[]
 
   const rawPath = event.rawPath // 例: "/tenants/12345"
   const method = event.requestContext.http.method // 例: "GET"
 
+  if(!userGroups || userGroups.length != 1) {
+    // グループが無い、または複数ある場合は不許可
+    authResponse.context = { reason: 'User has no groups assigned' }
+    logger.error(`User has no groups assigned: ${userName}`)
+    return  authResponse
+  }
+
+  const userGroup = userGroups[0] as UserGroups
+
   // methodとrowPath,userRoleからアクセス権限を判定
-  if (authManager.isAuthorizedRoute(method, rawPath, userRole)) {
+  if (authManager.isAuthorizedRoute(method, rawPath, userGroup)) {
     authResponse.isAuthorized = true
-    authResponse.context = { userName, userRole }
-    logger.info(`Authorization granted for ${method} ${rawPath}, role=${userRole}`)
+    authResponse.context = { userName, userGroup }
+    logger.info(`Authorization granted for ${method} ${rawPath}, group=${userGroup}`)
   } else {
     authResponse.context = { reason: 'User is not authorized to access this resource' }
-    logger.error(`Authorization denied for ${method} ${rawPath}, role=${userRole}`)
+    logger.error(`Authorization denied for ${method} ${rawPath}, group=${userGroup}`)
   }
 
   logger.info(`Authorization result: ${authResponse.isAuthorized}, reason: ${authResponse.context.reason || 'OK'}`)
@@ -73,17 +79,20 @@ export const handler = async (
 
 // JWTを検証する関数
 async function validateJWT(token: string): Promise<JWTPayload | false> {
-  const jwksUrl = `https://cognito-idp.${region}.amazonaws.com/${operationsUsersUserPoolId}/.well-known/jwks.json`
+  const issuer = `https://cognito-idp.${region}.amazonaws.com/${operationsUsersUserPoolId}`
+  const jwksUrl = `${issuer}/.well-known/jwks.json`
   const JWKS = createRemoteJWKSet(new URL(jwksUrl))
 
   try {
     const { payload } = await jwtVerify(token, JWKS, {
       algorithms: ["RS256"],
-      audience: operationsUsersAppClientId
+      audience: operationsUsersAppClientId,
+      issuer: issuer,
+      clockTolerance: 5
     })
     return payload;
   } catch (err) {
-    logger.info("JWT validation failed:" + err)
+    logger.error("JWT validation failed:" + err)
     return false
   }
 }

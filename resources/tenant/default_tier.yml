@@ -47,11 +47,11 @@ Resources:
         - AttributeDataType: "String"
           Name: tenantId
           Required: false
-          Mutable: false
+          Mutable: true # 一時的にtrue
         - AttributeDataType: "String"
           Name: userRole
           Required: false
-          Mutable: false
+          Mutable: true # 一時的にtrue
       MfaConfiguration: "OPTIONAL"
       EnabledMfas: 
         - SOFTWARE_TOKEN_MFA #TOTPを有効化
@@ -81,32 +81,32 @@ Resources:
   CognitoTenantsAdminGroup:
     Type: AWS::Cognito::UserPoolGroup
     Properties:
-      GroupName: admin
-      Description: Admin user group
+      GroupName: TenantAdmin
+      Description: Tenant Admin group
       Precedence: 0
       UserPoolId: !Ref CognitoTenantsUserPool
 
   CognitoTenantsSubAdminGroup:
     Type: AWS::Cognito::UserPoolGroup
     Properties:
-      GroupName: subadmin
-      Description: SubAdmin user group
+      GroupName: TenantSubAdmin
+      Description: Tenant SubAdmin group
       Precedence: 1
       UserPoolId: !Ref CognitoTenantsUserPool
 
   CognitoTenantsTeacherGroup:
     Type: AWS::Cognito::UserPoolGroup
     Properties:
-      GroupName: teacher
-      Description: Teacher user group
+      GroupName: TenantTeacher
+      Description: Tenant Teacher group
       Precedence: 2
       UserPoolId: !Ref CognitoTenantsUserPool
 
   CognitoTenantsStudentGroup:
     Type: AWS::Cognito::UserPoolGroup
     Properties:
-      GroupName: student
-      Description: Student user group
+      GroupName: TenantStudent
+      Description: Tenant Student group
       Precedence: 3
       UserPoolId: !Ref CognitoTenantsUserPool
 

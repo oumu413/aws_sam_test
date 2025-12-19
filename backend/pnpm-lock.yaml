@@ -109,6 +109,25 @@ importers:
         specifier: ^4.17.25
         version: 4.17.25
 
+  tenants/init_service:
+    dependencies:
+      '@codegenie/serverless-express':
+        specifier: 4.15.0
+        version: 4.15.0
+      '@commons/logger':
+        specifier: workspace:*
+        version: link:../../commons/logger
+      express:
+        specifier: ^5.1.0
+        version: 5.2.1
+    devDependencies:
+      '@types/aws-lambda':
+        specifier: ^8.10.158
+        version: 8.10.159
+      '@types/express':
+        specifier: ^4.17.25
+        version: 4.17.25
+
   tenants/users_service:
     dependencies:
       '@codegenie/serverless-express':
