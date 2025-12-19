@@ -98,7 +98,7 @@ Resources:
             var viewerHost = headers['host'] ? headers['host'].value : '';
             if (viewerHost) {
               // API Gateway に転送するため別名ヘッダに保存
-              headers['origin-host'] = { value: viewerHost };
+              headers['x-forwarded-host'] = { value: viewerHost };
               req.headers = headers;
             }
             return req; // オリジンへ進める
@@ -191,8 +191,8 @@ Resources:
               - OPTIONS
             Compress: true
             CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad # CachingDisabled
-            #OriginRequestPolicyId: b689b0a8-53d0-40ab-baf2-68738e2966ac # AllViewerExceptHostHeader　カスタムポリシーにするか検討
-            OriginRequestPolicyId: !Ref OriginRequestPolicyForwardXFH
+            OriginRequestPolicyId: b689b0a8-53d0-40ab-baf2-68738e2966ac # AllViewerExceptHostHeader　カスタムポリシーにするか検討
+            #OriginRequestPolicyId: !Ref OriginRequestPolicyForwardXFH
             FunctionAssociations:
               - EventType: viewer-request
                 FunctionARN: !GetAtt AddOriginHostFunction.FunctionMetadata.FunctionARN
