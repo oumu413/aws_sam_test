@@ -133,6 +133,8 @@ Resources:
             Path: /tenant/init
             Method: GET
             PayloadFormatVersion: "2.0"
+          Auth:
+            Authorization: NONE
   
   TenantsInitFunctionLogGroup:
     Type: AWS::Logs::LogGroup

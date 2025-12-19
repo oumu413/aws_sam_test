@@ -15,12 +15,12 @@ app.use('/api/tenant',
   router
 )
 
-type CognitoInfo = {
+type CognitoConfig = {
   userPoolId: string,
   userPoolClientId: string,
 }
 
-const COGNITO_BY_SUBDOMAIN: Record<string, CognitoInfo> = {
+const COGNITO_BY_SUBDOMAIN: Record<string, CognitoConfig> = {
   'test': {
     userPoolId: 'ap-northeast-3_MZgLMknuQ',
     userPoolClientId: '4tfv7a892isat8sjt06v74ijhb',
@@ -44,7 +44,7 @@ function withAuthzLog() {
 
 
 router.get('/init', (req: Request, res: Response) => {
-  const info: CognitoInfo = res.locals.cognito
+  const info: CognitoConfig = res.locals.cognito
   return res.json(info)
 })
 
