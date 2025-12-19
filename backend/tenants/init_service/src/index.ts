@@ -81,7 +81,7 @@ function extractSubdomain(hostOrDomain?: string, baseDomain?: string): string {
 
 function withCognitoFromSubdomain(baseDomain?: string) {
   return (req: Request, res: Response, next: NextFunction) => {
-    const originHost = req.headers?.['origin-host']
+    const originHost = req.headers?.['x-forwarded-host']
 
     // event優先、なければヘッダ
     const host = (originHost || '').toString()

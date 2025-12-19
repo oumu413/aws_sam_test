@@ -104,21 +104,6 @@ Resources:
             return req; // オリジンへ進める
           }
 
-  OriginRequestPolicyForwardXFH:
-    Type: AWS::CloudFront::OriginRequestPolicy
-    Properties:
-      OriginRequestPolicyConfig:
-        Name: forward-x-forwarded-host-only
-        Comment: Forward X-Forwarded-Host to origin (do NOT forward Host)
-        HeadersConfig:
-          HeaderBehavior: whitelist
-          Headers:
-            - X-Forwarded-Host
-        CookiesConfig:
-          CookieBehavior: none
-        QueryStringsConfig:
-          QueryStringBehavior: none
-
   TenantsSiteCloudFrontDistribution:
     Type: AWS::CloudFront::Distribution
     DependsOn:
@@ -191,8 +176,7 @@ Resources:
               - OPTIONS
             Compress: true
             CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad # CachingDisabled
-            OriginRequestPolicyId: b689b0a8-53d0-40ab-baf2-68738e2966ac # AllViewerExceptHostHeader　カスタムポリシーにするか検討
-            #OriginRequestPolicyId: !Ref OriginRequestPolicyForwardXFH
+            OriginRequestPolicyId: b689b0a8-53d0-40ab-baf2-68738e2966ac # AllViewerExceptHostHeader
             FunctionAssociations:
               - EventType: viewer-request
                 FunctionARN: !GetAtt AddOriginHostFunction.FunctionMetadata.FunctionARN
