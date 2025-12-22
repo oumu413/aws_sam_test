@@ -2,7 +2,7 @@
 const rolePermissions: Record<UserGroups, string[]> = {
   OperationAdmin: ['*'], // 全権限
   OperationViewer: ['GET /tenants/*'], // 動的パス対応
-  TenantAdmin: [],
+  TenantAdmin: ['*'],
   TenantSubAdmin: [],
   TenantTeacher: [],
   TenantStudent: []
