@@ -61,8 +61,6 @@ Resources:
         - "ALLOW_REFRESH_TOKEN_AUTH"
         - "ALLOW_USER_SRP_AUTH"
       PreventUserExistenceErrors: ENABLED # ユーザーが存在しない場合、エラーメッセージを曖昧
-      ReadAttributes:
-        - "custom:userRole"
 
   CognitoOperationsAdminGroup:
     Type: AWS::Cognito::UserPoolGroup
