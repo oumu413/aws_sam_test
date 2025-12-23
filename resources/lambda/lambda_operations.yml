@@ -188,7 +188,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: operations-tenant-management-function
-      CodeUri: ../../backend/operations/tenant_maangement_service/dist
+      CodeUri: ../../backend/operations/tenant_management_service/dist
       Handler: index.handler
       Role: !GetAtt OperationsTenantManagementRole.Arn
       Events:
