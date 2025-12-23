@@ -91,8 +91,8 @@ async function validateJWT(token: string): Promise<JWTPayload | false> {
       clockTolerance: 5
     })
     return payload;
-  } catch (err) {
-    logger.error("JWT validation failed:" + err)
+  } catch (error) {
+    logger.error("JWT validation failed:" + error)
     return false
   }
 }

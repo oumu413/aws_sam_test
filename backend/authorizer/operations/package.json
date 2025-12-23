@@ -11,10 +11,9 @@
   "dependencies": {
     "@commons/auth_manager": "workspace:*",
     "@commons/logger": "workspace:*",
-    "aws-lambda": "^1.0.7",
     "jose": "^6.1.2"
   },
   "devDependencies": {
-    "@types/aws-lambda": "^8.10.158"
+    "@types/aws-lambda": "^8.10.159"
   }
 }

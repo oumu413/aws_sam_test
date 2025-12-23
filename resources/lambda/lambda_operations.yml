@@ -2,6 +2,14 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: Lambda Functions for Operations Site
 
+Parameters:
+  AppName:
+    Type: String
+  DomainName:
+    Type: String
+  HostedZoneId:
+    Type: String
+
 Globals:
   Function:
     Runtime: nodejs24.x
@@ -95,6 +103,109 @@ Resources:
 ###################################################################################
 ## 管理者サイト用 Operations Service Lambda Function
 ###################################################################################
+  OperationsTenantManagementRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: operations-tenanat-management-role
+      Path: '/'
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        # Route53 Aレコード作成/削除（対象HostedZoneに限定）
+        - PolicyName: route53-change-records
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Sid: ChangeARecordsInHostedZone
+                Effect: Allow
+                Action:
+                  - route53:ChangeResourceRecordSets
+                Resource:
+                  - !Sub "arn:aws:route53:::hostedzone/${HostedZoneId}"
+#              - Sid: ReadHostedZoneMetadata
+#                Effect: Allow
+#                Action:
+#                  - route53:GetHostedZone
+#                  - route53:ListResourceRecordSets
+#                Resource:
+#                  - !Sub "arn:aws:route53:::hostedzone/${HostedZoneId}"
+        # CloudFormation の Outputs 参照（読み取りのみ）
+        - PolicyName: cloudformation-read-outputs
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Sid: DescribeStacksToReadOutputs
+                Effect: Allow
+                Action:
+                  - cloudformation:DescribeStacks
+                  - cloudformation:ListStacks
+                Resource: "*"
+        # Cognito ユーザープール／クライアント／グループ 操作
+        - PolicyName: cognito-idp-management
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              # ユーザープール作成・削除
+              - Sid: ManageUserPools
+                Effect: Allow
+                Action:
+                  - cognito-idp:CreateUserPool
+                  - cognito-idp:DeleteUserPool
+#                  - cognito-idp:DescribeUserPool
+#                  - cognito-idp:ListUserPools
+                Resource: "*"
+              # クライアント作成・削除（ユーザープールに紐づくためプールARNに限定）
+              - Sid: ManageUserPoolClients
+                Effect: Allow
+                Action:
+                  - cognito-idp:CreateUserPoolClient
+#                  - cognito-idp:DeleteUserPoolClient
+#                  - cognito-idp:DescribeUserPoolClient
+#                  - cognito-idp:ListUserPoolClients
+                Resource:
+                  - !Sub "*"
+              # グループ作成・削除（グループはプール配下のリソースとして扱う）
+              - Sid: ManageUserGroups
+                Effect: Allow
+                Action:
+                  - cognito-idp:CreateGroup
+#                  - cognito-idp:DeleteGroup
+#                  - cognito-idp:ListGroups
+#                  - cognito-idp:GetGroup
+                Resource:
+                  - !Sub "*"
+
+  OperationsTenantManagementFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: operations-tenant-management-function
+      CodeUri: ../../backend/operations/tenant_maangement_service/dist
+      Handler: index.handler
+      Role: !GetAtt OperationsTenantManagementRole.Arn
+      Events:
+        HttpApiEvent:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref OperationsHttpApi
+            Path: /operation/management/{proxy+}
+            Method: ANY
+            PayloadFormatVersion: "2.0"
+      Environment:
+        Variables:
+          OPERATIONS_REGION: !Ref "AWS::Region"
+          HOSTED_ZONE_ID: !Ref HostedZoneId
+          BASE_DOMEIN: !Ref DomainName
+  
+
   OperationsExecutionRole:
     Type: AWS::IAM::Role
     Properties:

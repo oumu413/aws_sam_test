@@ -1,0 +1,9 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+  },
+  "include": ["src", "../users_service/src/auth_manager.ts"],
+  "exclude": ["dist", "node_modules"]
+}

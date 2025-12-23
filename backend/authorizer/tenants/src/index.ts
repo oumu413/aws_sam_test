@@ -79,6 +79,7 @@ export const handler = async (
 
   const userName = claims["cognito:username"] as string
   const userGroups = claims["cognito:groups"] as UserGroups[]
+  // const tenantId = claims["custom:tenantId"] as string
 
   const rawPath = event.rawPath // 例: "/tenants/12345"
   const method = event.requestContext.http.method // 例: "GET"
@@ -120,8 +121,8 @@ async function validateJWT(token: string, userPoolId: string, appClientId: strin
       clockTolerance: 5
     })
     return payload;
-  } catch (err) {
-    logger.error("JWT validation failed:" + err)
+  } catch (error) {
+    logger.error("JWT validation failed:" + error)
     return false
   }
 }
