@@ -3,8 +3,6 @@ Transform: AWS::Serverless-2016-10-31
 Description: Lambda Functions for Operations Site
 
 Parameters:
-  AppName:
-    Type: String
   DomainName:
     Type: String
   HostedZoneId:
