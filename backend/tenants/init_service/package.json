@@ -9,7 +9,7 @@
     "tsc": "tsc"
   },
   "dependencies": {
-    "@codegenie/serverless-express": "4.15.0",
+    "@codegenie/serverless-express": "4.17.1",
     "@commons/logger": "workspace:*",
     "express": "^5.1.0"
   },

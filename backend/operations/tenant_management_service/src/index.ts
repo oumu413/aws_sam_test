@@ -12,7 +12,7 @@ app.use(express.urlencoded({ extended: true }))
 
 app.use('/api/operation/management',
   withAuthzLog(),
-  //router
+  router
 )
 
 function withAuthzLog() {
@@ -35,19 +35,8 @@ if (!region || !hostedZoneId || !baseDomein) {
 }
 
 
-app.post("/api/operation/management/route53/create", (req, res) => {
-  // 期待: req.body = { name: "test" }
-  res.json({
-    ok: true,
-    typeofBody: typeof req.body,
-    received: req.body,
-  });
-});
-
-
-
-//router.use('/route53', route53)
-//router.use('/cognito', cognito)
+router.use('/route53', route53)
+router.use('/cognito', cognito)
 
 
 export const handler = serverlessExpress({ app })
