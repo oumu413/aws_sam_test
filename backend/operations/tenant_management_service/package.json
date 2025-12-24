@@ -12,7 +12,7 @@
     "@aws-sdk/client-cloudformation": "^3.956.0",
     "@aws-sdk/client-cognito-identity-provider": "^3.957.0",
     "@aws-sdk/client-route-53": "^3.956.0",
-    "@codegenie/serverless-express": "4.15.0",
+    "@codegenie/serverless-express": "4.17.1",
     "@commons/auth_manager": "workspace:*",
     "@commons/logger": "workspace:*",
     "express": "^5.1.0",
