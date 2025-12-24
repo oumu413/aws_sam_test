@@ -8,13 +8,9 @@ import {
   CreateCognitoInput
 } from './schemas/cognitoSchemas'
 import { validate } from './middlewares/validate'
-import { getCloudformationOutputs } from './commons/cloudformation'
 
 const router:Router = express.Router()
 const region = process.env.OPERATIONS_REGION
-const hostedZoneId = process.env.HOSTED_ZONE_ID
-const baseDomein = process.env.BASE_DOMEIN
-const CLOUDFRONT_ZONE_ID = "Z2FDTNDATAQYW2" // CloudFront用 固定
 const cognito = new CognitoIdentityProviderClient({ region:region })
 
 router.post('/create', 

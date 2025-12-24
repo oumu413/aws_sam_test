@@ -16,7 +16,9 @@ export const validate =
       const message = error instanceof Error ? error.message : `Unknown error: ${String(error)}`
       if (error instanceof z.ZodError) {
         logger.warn(`[Validation Failed] method="${req.method}" path="${req.path}" message="${message}"`)
-        logger.warn(`req.body:"${req.body}" req.query:"${req.query}" req.params"${req.params}"`)
+        console.log(req.body)
+        console.log(req.query)
+        console.log(req.params)
         return res.status(400).json({
           error: "Validation failed",
           details: error.issues.map((issue) => ({

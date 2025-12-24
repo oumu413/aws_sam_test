@@ -198,8 +198,6 @@ Resources:
             Path: /operation/management/{proxy+}
             Method: ANY
             PayloadFormatVersion: "2.0"
-            Auth:
-              Authorizer: NONE
       Environment:
         Variables:
           OPERATIONS_REGION: !Ref "AWS::Region"
