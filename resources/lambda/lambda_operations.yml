@@ -146,6 +146,7 @@ Resources:
                 Action:
                   - cloudformation:DescribeStacks
                   - cloudformation:ListStacks
+                  - cloudformation:ListExports
                 Resource: "*"
         # Cognito ユーザープール／クライアント／グループ 操作
         - PolicyName: cognito-idp-management
