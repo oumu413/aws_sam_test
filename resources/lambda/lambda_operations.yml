@@ -194,7 +194,7 @@ Resources:
           Type: HttpApi
           Properties:
             ApiId: !Ref OperationsHttpApi
-            Path: /operation/management/{proxy+}
+            Path: /operation/management/route53/{proxy+}
             Method: ANY
             PayloadFormatVersion: "2.0"
       Environment:
@@ -202,6 +202,12 @@ Resources:
           OPERATIONS_REGION: !Ref "AWS::Region"
           HOSTED_ZONE_ID: !Ref HostedZoneId
           BASE_DOMEIN: !Ref DomainName
+
+  OperationsTenantManagementFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${OperationsTenantManagementFunction}
+      RetentionInDays: 14
   
 
   OperationsExecutionRole:

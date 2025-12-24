@@ -2,6 +2,7 @@ import express, { Router, Request, Response, NextFunction }  from 'express'
 import serverlessExpress, { getCurrentInvoke } from '@codegenie/serverless-express'
 import logger from '@commons/logger'
 import route53 from './route53'
+import cognito from './cognito'
 
 const app = express()
 const router = Router()
@@ -35,6 +36,7 @@ if (!region || !hostedZoneId || !baseDomein) {
 
 
 router.use('/route53', route53)
+router.use('/cognito', cognito)
 
 
 export const handler = serverlessExpress({ app })
