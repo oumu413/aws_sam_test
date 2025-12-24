@@ -11,9 +11,16 @@ export const createCognitoSchema = z.object({
     .regex(/[^-]$/, { message: "name cannot end with a hyphen"})
 })
 
+export const deleteCognitoSchema = z.object({
+  id: z.string({
+      message: "name is required",
+    })
+})
+
 
 // 型の推論
 export type CreateCognitoInput = z.infer<typeof createCognitoSchema>
+export type DeleteCognitoInput = z.infer<typeof deleteCognitoSchema>
 
 
 

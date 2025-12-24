@@ -1,6 +1,6 @@
 import express from 'express'
 import type { Router, Request, Response } from 'express'
-import { Route53Client, ChangeResourceRecordSetsCommand, GetChangeCommand } from '@aws-sdk/client-route-53'
+import { Route53Client, ChangeResourceRecordSetsCommand, ChangeAction }  from '@aws-sdk/client-route-53'
 import z from 'zod'
 import logger from '@commons/logger'
 import { route53Schema, Route53Input } from './schemas/route53Schemas'
@@ -20,26 +20,13 @@ router.post('/create',
       const { name } = req.body
       const fqdn = `${name}.${baseDomain}`
       const cloudFrontDomainName= await getCloudformationOutputs('Tenants-Site-CloudFrontDomainName')
-      const changeRes = await route53.send(new ChangeResourceRecordSetsCommand({
-        HostedZoneId: hostedZoneId,
-        ChangeBatch: {
-          Comment: `"UPSERT ALIAS A "${fqdn}" -> "${cloudFrontDomainName}"`,
-          Changes: [
-            {
-              Action: "UPSERT", // 更新、なければ作成
-              ResourceRecordSet: {
-                Name: fqdn,
-                Type: 'A',
-                AliasTarget: {
-                  DNSName: cloudFrontDomainName,
-                  HostedZoneId: CLOUDFRONT_ZONE_ID,
-                  EvaluateTargetHealth: false, // ターゲットのヘルス状態を確認するか
-                },
-              }
-            }
-          ]
-        }
-      }))
+      await route53.send(makeChangeResourceRecordSetsCommand(
+          fqdn,
+          cloudFrontDomainName,
+          "UPSERT",
+          `"UPSERT ALIAS A "${fqdn}" -> "${cloudFrontDomainName}"`
+        )
+      )
       res.status(202).json({ result: true })
     }
     catch(error) {
@@ -56,13 +43,37 @@ router.delete('/delete',
       const { name } = req.query
       const fqdn = `${name}.${baseDomain}`
       const cloudFrontDomainName= await getCloudformationOutputs('Tenants-Site-CloudFrontDomainName')
-      const changeRes = await route53.send(new ChangeResourceRecordSetsCommand({
+      await route53.send(makeChangeResourceRecordSetsCommand(
+          fqdn,
+          cloudFrontDomainName,
+          "DELETE",
+          `DELETE ALIAS A ${fqdn}`
+        )
+      )
+      res.status(202).json({ result: true })
+    }
+    catch(error) {
+      logger.error('error:' + error)
+      res.status(500).json({ error: "Failed to create Route53" })
+    }
+  }
+)
+
+
+
+function makeChangeResourceRecordSetsCommand(
+  fqdn:string,
+  cloudFrontDomainName:string,
+  action:ChangeAction,
+  comment:string
+){
+  return new ChangeResourceRecordSetsCommand({
         HostedZoneId: hostedZoneId,
         ChangeBatch: {
-          Comment: `DELETE ALIAS A ${fqdn}`,
+          Comment: comment,
           Changes: [
             {
-              Action: "DELETE", // 削除
+              Action: action, // 削除
               ResourceRecordSet: {
                 Name: fqdn,
                 Type: 'A',
@@ -75,15 +86,8 @@ router.delete('/delete',
             }
           ]
         }
-      }))
-      res.status(202).json({ result: true })
-    }
-    catch(error) {
-      logger.error('error:' + error)
-      res.status(500).json({ error: "Failed to create Route53" })
-    }
-  }
-)
+      })
+}
 
 
 
