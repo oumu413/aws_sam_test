@@ -17,7 +17,7 @@ const CLOUDFRONT_ZONE_ID = "Z2FDTNDATAQYW2" // CloudFront用 固定
 const route53 = new Route53Client({})
 
 router.post('/create', 
-  validate(z.object({ body: createRoute53Schema })),
+  //alidate(z.object({ body: createRoute53Schema })),
   async (req: Request<{}, {}, CreateRoute53Input>, res: Response) => {
     try{
       const { name } = req.body
