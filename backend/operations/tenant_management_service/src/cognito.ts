@@ -24,7 +24,18 @@ router.post('/create',
       const { name } = req.body
       const changeRes = await cognito.send(new CreateUserPoolCommand({
         PoolName: name + '-user-pool',
-        UsernameAttributes: ['email'], // 必要に応じてユーザー名として使う属性
+        UsernameConfiguration: {
+          CaseSensitive: true, // ユーザー名の大文字小文字を区別
+        },
+        AccountRecoverySetting: {
+          RecoveryMechanisms: [
+            {
+              Name: "admin_only",
+              Priority: 1,
+            },
+          ],
+        },
+
         Schema: [
           {
             Name: 'email',
@@ -45,8 +56,7 @@ router.post('/create',
             Mutable: true,
           },
         ],
-        AutoVerifiedAttributes: ['email'], // メールアドレスの自動検証
-        MfaConfiguration: 'OFF', // MFAの設定（例：OFF, OPTIONAL, ON）
+        MfaConfiguration: 'OFF',
         Policies: {
           PasswordPolicy: {
             MinimumLength: 8,
