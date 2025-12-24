@@ -9,6 +9,7 @@ import {
 } from './schemas/route53Schemas'
 import { validate } from './middlewares/validate'
 import { getCloudformationOutputs } from './commons/cloudformation'
+import { getCurrentInvoke } from '@codegenie/serverless-express'
 
 const router:Router = express.Router()
 const hostedZoneId = process.env.HOSTED_ZONE_ID
@@ -20,7 +21,8 @@ router.post('/create',
   //alidate(z.object({ body: createRoute53Schema })),
   async (req: Request<{}, {}, CreateRoute53Input>, res: Response) => {
     try{
-      
+  const { event } = getCurrentInvoke()
+      logger.info("[Raw Event]" + JSON.stringify(event));
 logger.info(`Request Info: ${JSON.stringify({
   method: req.method,
   path: req.path,
