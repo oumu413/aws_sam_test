@@ -102,8 +102,8 @@ importers:
   operations/users_service:
     dependencies:
       '@codegenie/serverless-express':
-        specifier: 4.15.0
-        version: 4.15.0
+        specifier: 4.17.1
+        version: 4.17.1
       '@commons/auth_manager':
         specifier: workspace:*
         version: link:../../commons/auth_manager
@@ -124,8 +124,8 @@ importers:
   tenants/init_service:
     dependencies:
       '@codegenie/serverless-express':
-        specifier: 4.15.0
-        version: 4.15.0
+        specifier: 4.17.1
+        version: 4.17.1
       '@commons/logger':
         specifier: workspace:*
         version: link:../../commons/logger
@@ -143,8 +143,8 @@ importers:
   tenants/users_service:
     dependencies:
       '@codegenie/serverless-express':
-        specifier: 4.15.0
-        version: 4.15.0
+        specifier: 4.17.1
+        version: 4.17.1
       '@commons/auth_manager':
         specifier: workspace:*
         version: link:../../commons/auth_manager
@@ -402,10 +402,6 @@ packages:
   '@aws/lambda-invoke-store@0.2.2':
     resolution: {integrity: sha512-C0NBLsIqzDIae8HFw9YIrIBsbc0xTiOtt7fAukGPnqQ/+zZNaq+4jhuccltK0QuWHBnNm/a6kLIRA6GFiM10eg==}
     engines: {node: '>=18.0.0'}
-
-  '@codegenie/serverless-express@4.15.0':
-    resolution: {integrity: sha512-adnKbnW1Tg5LAe0lcbyoRchu8G6+gLwP1rvgwfHvTbCwvBQNfhsgnzq4cKkLn7ZKn2sa4JZNis/Gn/2jWBWa4A==}
-    engines: {node: '>=12'}
 
   '@codegenie/serverless-express@4.17.1':
     resolution: {integrity: sha512-B/4RRtVK2iAp5ho+qoUFxUeMaWCgSP+hNrdLJV3DWKZ1E9n9oLKdsJ6W9LQekZsD8rGD15hDadIKWKKw5i3f3A==}
@@ -1947,8 +1943,6 @@ snapshots:
   '@aws/lambda-invoke-store@0.2.1': {}
 
   '@aws/lambda-invoke-store@0.2.2': {}
-
-  '@codegenie/serverless-express@4.15.0': {}
 
   '@codegenie/serverless-express@4.17.1': {}
 

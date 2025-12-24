@@ -9,7 +9,6 @@ import {
 } from './schemas/route53Schemas'
 import { validate } from './middlewares/validate'
 import { getCloudformationOutputs } from './commons/cloudformation'
-import { getCurrentInvoke } from '@codegenie/serverless-express'
 
 const router:Router = express.Router()
 const hostedZoneId = process.env.HOSTED_ZONE_ID
@@ -23,7 +22,6 @@ router.post('/create',
     try{
       const { name } = req.body
       const cloudFrontDomainName= await getCloudformationOutputs('Tenants-Site-CloudFrontDomainName')
-
       const changeRes = await route53.send(new ChangeResourceRecordSetsCommand({
         HostedZoneId: hostedZoneId,
         ChangeBatch: {
