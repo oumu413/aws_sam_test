@@ -7,14 +7,14 @@ import {
   createCognitoSchema,
   CreateCognitoInput
 } from './schemas/cognitoSchemas'
-import { validate } from './middlewares/validate'
+import { validateBody } from './middlewares/validate'
 
 const router:Router = express.Router()
 const region = process.env.OPERATIONS_REGION
 const cognito = new CognitoIdentityProviderClient({ region:region })
 
 router.post('/create', 
-  validate(z.object({ body: createCognitoSchema })),
+  validateBody(z.object({ body: createCognitoSchema })),
   async (req: Request<{}, {}, CreateCognitoInput>, res: Response) => {
     try{
       const { name } = req.body
