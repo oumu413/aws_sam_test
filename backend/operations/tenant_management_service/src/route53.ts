@@ -20,6 +20,7 @@ router.post('/create',
   //alidate(z.object({ body: createRoute53Schema })),
   async (req: Request<{}, {}, CreateRoute53Input>, res: Response) => {
     try{
+      logger.info(`req ${req}`)
       const { name } = req.body
       const cloudFrontDomainName= await getCloudformationOutputs('Tenants-Site-CloudFrontDomainName')
 
