@@ -1,6 +1,6 @@
 import { z } from "zod"
 
-export const createRoute53Schema = z.object({
+export const route53Schema = z.object({
   name: z.string({
       message: "name is required",
     })
@@ -12,8 +12,9 @@ export const createRoute53Schema = z.object({
 })
 
 
+
 // 型の推論
-export type CreateRoute53Input = z.infer<typeof createRoute53Schema>
+export type Route53Input = z.infer<typeof route53Schema>
 
 
 
