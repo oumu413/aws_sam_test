@@ -17,9 +17,19 @@ const CLOUDFRONT_ZONE_ID = "Z2FDTNDATAQYW2" // CloudFront用 固定
 const route53 = new Route53Client({})
 
 router.post('/create', 
-  validate(z.object({ body: createRoute53Schema })),
+  //alidate(z.object({ body: createRoute53Schema })),
   async (req: Request<{}, {}, CreateRoute53Input>, res: Response) => {
     try{
+      
+logger.info(`Request Info: ${JSON.stringify({
+  method: req.method,
+  path: req.path,
+  headers: req.headers,
+  query: req.query,
+  params: req.params,
+  body: req.body,
+})}`);
+
       const { name } = req.body
       const cloudFrontDomainName= await getCloudformationOutputs('Tenants-Site-CloudFrontDomainName')
 
