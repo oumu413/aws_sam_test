@@ -7,7 +7,7 @@ import {
   createRoute53Schema,
   CreateRoute53Input
 } from './schemas/route53Schemas'
-import { validateBody } from './middlewares/validate'
+import { validate } from './middlewares/validate'
 import { getCloudformationOutputs } from './commons/cloudformation'
 
 const router:Router = express.Router()
@@ -17,7 +17,7 @@ const CLOUDFRONT_ZONE_ID = "Z2FDTNDATAQYW2" // CloudFront用 固定
 const route53 = new Route53Client({})
 
 router.post('/create', 
-  validateBody(createRoute53Schema),
+  validate(z.object({ body: createRoute53Schema })),
   async (req: Request<{}, {}, CreateRoute53Input>, res: Response) => {
     try{
       const { name } = req.body
