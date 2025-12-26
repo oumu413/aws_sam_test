@@ -1,5 +1,11 @@
 <template>
-  <v-btn :color="color" :loading="loading" @click="$emit('click')">
+  <v-btn 
+    :color="color"
+    :loading="loading"
+    variant="flat"
+    rounded
+    @click="$emit('click')"
+  >
     <slot />
   </v-btn>
 </template>

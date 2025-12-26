@@ -5,9 +5,9 @@
 </template>
 
 <script lang="ts" setup>
-defineOptions({
+definePage({
   meta: {
-    layout: 'Auth'
+    layout: 'Auth',
   }
 })
 </script>

@@ -1,5 +1,9 @@
 <template>
-  <BaseButton color="primary" :loading="loading" @click="$emit('click')">
+  <BaseButton 
+    color="blue" 
+    :loading="loading" 
+    @click="$emit('click')"
+  >
     送信
   </BaseButton>
 </template>

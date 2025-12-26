@@ -38,7 +38,6 @@
 
 <script setup lang="ts">
 import { fetchAuthSession, signOut, signIn } from "aws-amplify/auth"
-import { useRouter } from "vue-router" 
 import { mdiAccountCircle, mdiCloseCircle, mdiLock, mdiEye, mdiEyeOff } from '@mdi/js'
 
   const userName = ref('')
@@ -59,7 +58,7 @@ import { mdiAccountCircle, mdiCloseCircle, mdiLock, mdiEye, mdiEyeOff } from '@m
       const result = await signIn({ username: userName.value, password: password.value })
   
       if (result.nextStep.signInStep === 'DONE') {
-        router.push('/tenants')
+        router.push('/home')
       }
       else if(result.nextStep.signInStep === 'CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED'){
         router.push('/new-password')

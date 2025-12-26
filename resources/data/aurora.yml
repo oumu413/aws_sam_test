@@ -1,0 +1,154 @@
+
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Aurora Serverless v2 + VPC + Secrets
+
+Parameters:
+  ProjectName:
+    Type: String
+    Default: attendance-app
+  EngineVersion:
+    Type: String
+    Default: '8.0.mysql_aurora.3.08.0'   # Aurora MySQL 3.08+ supports Data API on Serverless v2
+    Description: Aurora engine version (e.g., MySQL 3.08+ or PG 15.5+)
+  DBName:
+    Type: String
+    Default: attendance
+  MinACU:
+    Type: Number
+    Default: 2
+    Description: Minimum ACU (set 0 if engine supports zero scaling)
+  MaxACU:
+    Type: Number
+    Default: 32
+    Description: Maximum ACU (up to 256 depending on engine/version)
+  VpcCidr:
+    Type: String
+    Default: 10.0.0.0/16
+  PrivateSubnet1Cidr:
+    Type: String
+    Default: 10.0.1.0/24
+  PrivateSubnet2Cidr:
+    Type: String
+    Default: 10.0.2.0/24
+
+Globals:
+  Function:
+    Runtime: nodejs22.x
+    Timeout: 10
+    MemorySize: 512
+    Tracing: Active
+    Environment:
+      Variables:
+        DB_NAME: !Ref DBName
+
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCidr
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: !Sub '${ProjectName}-vpc'
+
+  PrivateSubnetA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Ref PrivateSubnet1Cidr
+      AvailabilityZone: !Select [0, !GetAZs '']
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Sub '${ProjectName}-subnet-a'
+
+  #PrivateSubnetB:
+  #  Type: AWS::EC2::Subnet
+  #  Properties:
+  #    VpcId: !Ref VPC
+  #    CidrBlock: !Ref PrivateSubnet2Cidr
+  #    AvailabilityZone: !Select [1, !GetAZs '']
+  #    MapPublicIpOnLaunch: false
+  #    Tags:
+  #      - Key: Name
+  #        Value: !Sub '${ProjectName}-subnet-b'
+
+  AuroraSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Aurora security group
+      VpcId: !Ref VPC
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: !Sub '${ProjectName}-aurora-sg'
+
+  DBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: !Sub '${ProjectName} aurora subnet group'
+      SubnetIds:
+        - !Ref PrivateSubnetA
+        #- !Ref PrivateSubnetB
+
+  AuroraCluster:
+    Type: AWS::RDS::DBCluster
+    Properties:
+      DBClusterIdentifier: !Sub '${ProjectName}-cluster'
+      Engine: aurora-mysql
+      EngineVersion: !Ref EngineVersion
+      DatabaseName: !Ref DBName
+      DBSubnetGroupName: !Ref DBSubnetGroup
+      VpcSecurityGroupIds:
+        - !Ref AuroraSG
+      ManageMasterUserPassword: true         # Secrets Managerにマスターシークレット自動作成
+      MasterUsername: admin
+      BackupRetentionPeriod: 3
+      DeletionProtection: false
+      EnableCloudwatchLogsExports:
+        - general
+      EnableHttpEndpoint: true               # ★ Data APIを有効化（CloudFormationでサポート） 
+      ServerlessV2ScalingConfiguration:
+        MinCapacity: !Ref MinACU
+        MaxCapacity: !Ref MaxACU
+
+  AuroraWriter:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBClusterIdentifier: !Ref AuroraCluster
+      DBInstanceIdentifier: !Sub '${ProjectName}-writer'
+      DBInstanceClass: db.serverless         # Serverless v2 インスタンス
+      PubliclyAccessible: false
+      EnablePerformanceInsights: true
+
+  AppSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: !Sub '${ProjectName}/app-secret'
+      Description: App-level secret (e.g., API key)
+      SecretString: !Sub '{"apiKey":"${AWS::StackName}-key-123"}'
+
+
+Outputs:
+  ApiEndpoint:
+    Description: HTTP API base URL
+    Value: !Sub 'https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/v1'
+  UserPoolId:
+    Description: Cognito User Pool Id
+    Value: !Ref UserPool
+  UserPoolClientId:
+    Description: Cognito User Pool Client Id (JWT audience)
+    Value: !Ref UserPoolClient
+  AuroraClusterArn:
+    Description: Aurora DB Cluster ARN (use with Data API resourceArn)
+    Value: !GetAtt AuroraCluster.DBClusterArn
+  AuroraSecretArn:
+    Description: Secrets Manager ARN for the master user (Data API secretArn)
+    Value: !GetAtt AuroraCluster.MasterUserSecret.SecretArn
+  AppSecretArn:
+    Description: Application-level secret ARN
+    Value: !Ref AppSecret

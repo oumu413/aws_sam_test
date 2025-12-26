@@ -1,5 +1,5 @@
 {
-  "name": "app",
+  "name": "admin",
   "private": true,
   "type": "module",
   "version": "0.0.0",
@@ -12,6 +12,8 @@
     "lint": "eslint . --fix"
   },
   "dependencies": {
+    "aws-amplify": "^6.15.8",
+    "axios": "^1.13.2",
     "pinia": "^3.0.3",
     "vue": "^3.5.21",
     "vue-router": "^4.5.1",
